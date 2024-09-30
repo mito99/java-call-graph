@@ -16,7 +16,7 @@ public class MtClassTest {
 
   @Test
   void testGET() {
-    final var classInfo = this.classPool.getClass("example.debug.A");
+    final var classInfo = this.classPool.getClassOrThrow("example.debug.A");
     assertThat(classInfo.getClassName()).isEqualTo("example.debug.A");
     assertThat(classInfo.getPackageName()).isEqualTo("example.debug");
     assertThat(classInfo.getSimpleName()).isEqualTo("A");

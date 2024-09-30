@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
 import com.github.mito99.javacallgraph.bytecode.MtClassPool;
+import com.github.mito99.javacallgraph.bytecode.MtConfig;
 import com.github.mito99.javacallgraph.database.GraphDbRepository;
 import com.github.mito99.javacallgraph.database.GraphDbSession;
 
@@ -39,14 +40,21 @@ class RegisterCommand implements Callable<Integer> {
   @Option(names = { "-d", "--directory" }, description = "Directory path", required = true)
   private Path directoryPath;
 
+  @Option(names = { "-i", "--include" }, description = "Include classes (正規表現で指定)")
+  private String includeClassesRegex;
+
   @Override
   public Integer call() {
+    MtConfig.getInstance().setIncludeClassesRegex(includeClassesRegex);
+
     try (var session = GraphDbSession.start()) {
       final var module = MtClassPool.getModule(directoryPath, moduleName, moduleType);
       final var reqpos = new GraphDbRepository(session);
+      reqpos.createIndexes();
       reqpos.registerModule(module);
       return 0;
     } catch (Exception e) {
+      e.printStackTrace();
       System.err.println("An error occurred: " + e.getMessage());
       return 1;
     }
@@ -61,6 +69,7 @@ class DeleteCommand implements Callable<Integer> {
     try (var session = GraphDbSession.start()) {
       final var reqpos = new GraphDbRepository(session);
       reqpos.deleteAllNodes();
+      reqpos.dropIndexes();
       return 0;
     } catch (Exception e) {
       System.err.println("An error occurred: " + e.getMessage());

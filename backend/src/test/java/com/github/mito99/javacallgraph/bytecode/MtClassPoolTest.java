@@ -1,8 +1,8 @@
 package com.github.mito99.javacallgraph.bytecode;
 
-import static org.assertj.core.api.Assertions.assertThat; // 追記
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.nio.file.Path;
+import java.nio.file.Path; // 追記
 
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +15,7 @@ public class MtClassPoolTest {
   @Test
   void クラス名を取得するテスト() {
     final var pool = MtClassPool.getDefault();
-    final var classInfo = pool.getClass("java.lang.String");
+    final var classInfo = pool.getClassOrThrow("java.lang.String");
     assertThat(classInfo.getClassName()).isEqualTo("java.lang.String");
   }
 

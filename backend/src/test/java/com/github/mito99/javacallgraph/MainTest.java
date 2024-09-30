@@ -16,6 +16,17 @@ public class MainTest {
           "-d", "src/test/resources/module/commons-io-2.17.0"
       });
     }
+
+    @Test
+    void testMainWithInvalidModuleName() {
+      Main.main(new String[] {
+          "register",
+          "-m", "commons-io",
+          "-t", "jar",
+          "-d", "src/test/resources/module/commons-io-2.17.0",
+          "-i", "^org\\.apache\\.commons\\.io\\..*"
+      });
+    }
   }
 
   @Nested

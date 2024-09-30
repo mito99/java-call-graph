@@ -20,10 +20,6 @@ public class GraphDbRepository {
 
   public void registerModule(MtModule module) {
     log.info("Registering module: {}", module.getName());
-    this.session.writeTransaction(tx -> {
-      tx.run("CREATE INDEX IF NOT EXISTS FOR (n:Class) ON (n.hashCode)");
-      tx.run("CREATE INDEX IF NOT EXISTS FOR (n:Method) ON (n.hashCode)");
-    });
 
     this.session.writeTransaction(tx -> {
       tx.run("CREATE (m:Module {name: $name, type: $type})",
@@ -31,6 +27,20 @@ public class GraphDbRepository {
               "name", module.getName(),
               "type", module.getType()));
       registerClasses(tx, module.getName(), List.copyOf(module.getClasses().values()));
+    });
+  }
+
+  public void createIndexes() {
+    this.session.writeTransaction(tx -> {
+      tx.run("CREATE INDEX IF NOT EXISTS FOR (n:Class) ON (n.hashCode)");
+      tx.run("CREATE INDEX IF NOT EXISTS FOR (n:Method) ON (n.hashCode)");
+    });
+  }
+
+  public void dropIndexes() {
+    this.session.writeTransaction(tx -> {
+      tx.run("DROP INDEX IF EXISTS FOR (n:Class) ON (n.hashCode)");
+      tx.run("DROP INDEX IF EXISTS FOR (n:Method) ON (n.hashCode)");
     });
   }
 

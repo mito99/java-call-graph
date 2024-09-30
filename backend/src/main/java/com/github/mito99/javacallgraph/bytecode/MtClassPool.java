@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javassist.ClassPool;
@@ -26,8 +27,19 @@ public class MtClassPool {
   }
 
   @SneakyThrows
-  public MtClass getClass(String className) {
-    return new MtClass(this, this.classPool.get(className));
+  public Optional<MtClass> getClass(String className) {
+    val mtConfig = MtConfig.getInstance();
+    val includeClassesRegex = mtConfig.getIncludeClassesRegex();
+    if (className.matches(includeClassesRegex)) {
+      return Optional.of(new MtClass(this, this.classPool.get(className)));
+    }
+    return Optional.empty();
+  }
+
+  @SneakyThrows
+  public MtClass getClassOrThrow(String className) {
+    val mtClassOptional = getClass(className);
+    return mtClassOptional.orElseThrow(() -> new IllegalArgumentException("Class not found: " + className));
   }
 
   @SneakyThrows
@@ -40,6 +52,8 @@ public class MtClassPool {
       throw new IllegalArgumentException("Module directory not found: " + path);
     }
 
+    record ClassInfo(String className, Optional<MtClass> mtClass) {
+    }
     val classes = Files.walk(path).filter(Files::isRegularFile)
         .filter(p -> p.toString().endsWith(".class"))
         .filter(p -> !p.toString().contains("module-info.class"))
@@ -48,8 +62,10 @@ public class MtClassPool {
           val relativePath = path.relativize(p).toString();
           val className = relativePath.replace("/", ".")
               .replace(".class", "");
-          return Map.entry(className, classPool.getClass(className));
+          return new ClassInfo(className, classPool.getClass(className));
         })
+        .filter(p -> p.mtClass.isPresent())
+        .map(p -> Map.entry(p.className, p.mtClass.get()))
         .filter(Objects::nonNull)
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 

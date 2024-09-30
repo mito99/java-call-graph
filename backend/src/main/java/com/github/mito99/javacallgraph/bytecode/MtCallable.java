@@ -53,7 +53,11 @@ public interface MtCallable {
 
       int methodRefIndex = codeIterator.u16bitAt(index + 1);
       val className = constPool.getMethodrefClassName(methodRefIndex);
-      val calledClassInfo = classPool.getClass(className);
+      val calledClassInfoOptional = classPool.getClass(className);
+      if (calledClassInfoOptional.isEmpty()) {
+        continue;
+      }
+      val calledClassInfo = calledClassInfoOptional.get();
 
       val methodName = constPool.getMethodrefName(methodRefIndex);
       val methodDescriptor = constPool.getMethodrefType(methodRefIndex);

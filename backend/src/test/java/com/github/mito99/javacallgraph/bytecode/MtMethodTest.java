@@ -16,7 +16,7 @@ public class MtMethodTest {
 
   @Test
   void testGetDescriptor() {
-    final var classInfo = this.classPool.getClass("example.debug.A");
+    final var classInfo = this.classPool.getClassOrThrow("example.debug.A");
     final var methods = classInfo.getMethods();
     assertThat(methods).hasSize(1);
 
@@ -27,7 +27,7 @@ public class MtMethodTest {
 
   @Test
   void testGetCalledMethods() {
-    final var classInfo = this.classPool.getClass("example.debug.A");
+    final var classInfo = this.classPool.getClassOrThrow("example.debug.A");
     final var method = classInfo.getMethod("hello");
     final var calledMethods = method.getCalledMethods();
     assertThat(calledMethods).hasSize(2);
