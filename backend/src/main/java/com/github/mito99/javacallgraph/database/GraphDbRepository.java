@@ -18,6 +18,8 @@ public class GraphDbRepository {
 
   public void registerModule(MtModule module) {
     this.session.writeTransaction(tx -> {
+      tx.run("CREATE INDEX IF NOT EXISTS FOR (n:Class) ON (n.hashCode)");
+      tx.run("CREATE INDEX IF NOT EXISTS FOR (n:Method) ON (n.hashCode)");
       tx.run("CREATE (m:Module {name: $name, type: $type})",
           Values.parameters(
               "name", module.getName(),
