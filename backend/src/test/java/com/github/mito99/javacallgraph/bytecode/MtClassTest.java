@@ -5,20 +5,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import lombok.val;
-
 public class MtClassTest {
 
   private MtClassPool classPool;
 
   @BeforeEach
-  void setUp() {
+  public void setUp() {
     this.classPool = MtClassPool.getDefault();
   }
 
   @Test
   void testGET() {
-    val classInfo = this.classPool.get("example.debug.A");
+    final var classInfo = this.classPool.getClass("example.debug.A");
     assertThat(classInfo.getClassName()).isEqualTo("example.debug.A");
     assertThat(classInfo.getPackageName()).isEqualTo("example.debug");
     assertThat(classInfo.getSimpleName()).isEqualTo("A");

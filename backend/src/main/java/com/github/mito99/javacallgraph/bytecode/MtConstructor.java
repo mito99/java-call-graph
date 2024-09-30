@@ -44,4 +44,9 @@ public class MtConstructor implements MtCallable {
     return this.ctConstructor.getMethodInfo();
   }
 
+  @Override
+  public String getPackageName() {
+    return this.classInfo.getPackageName();
+  }
+
 }

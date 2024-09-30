@@ -5,33 +5,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import lombok.val;
-
 public class MtMethodTest {
 
   private MtClassPool classPool;
 
   @BeforeEach
-  void setUp() {
+  public void setUp() {
     this.classPool = MtClassPool.getDefault();
   }
 
   @Test
   void testGetDescriptor() {
-    val classInfo = this.classPool.get("example.debug.A");
-    val methods = classInfo.getMethods();
+    final var classInfo = this.classPool.getClass("example.debug.A");
+    final var methods = classInfo.getMethods();
     assertThat(methods).hasSize(1);
 
-    val method = methods.get(0);
-    val descriptor = method.getDescriptor();
+    final var method = methods.get("hello").get(0);
+    final var descriptor = method.getDescriptor();
     assertThat(descriptor).isEqualTo("()V");
   }
 
   @Test
   void testGetCalledMethods() {
-    val classInfo = this.classPool.get("example.debug.A");
-    val method = classInfo.getMethod("hello");
-    val calledMethods = method.getCalledMethods();
+    final var classInfo = this.classPool.getClass("example.debug.A");
+    final var method = classInfo.getMethod("hello");
+    final var calledMethods = method.getCalledMethods();
     assertThat(calledMethods).hasSize(2);
   }
 }

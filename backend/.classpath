@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="build/resources/test" path="src/test/resources">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="optional" value="true"/>
+			<attribute name="gradle.buildServer" value="true"/>
+			<attribute name="resource" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="build/classes/java/test" path="src/test/java">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="build/resources/main" path="src/main/resources">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="gradle.buildServer" value="true"/>
+			<attribute name="resource" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="build/classes/java/main" path="src/main/java">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="build/classes/java/test" path="build/generated/sources/annotationProcessor/java/test">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="optional" value="true"/>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="build/classes/java/main" path="build/generated/sources/annotationProcessor/java/main">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-21">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/org.javassist/javassist/3.30.2-GA/284580b5e42dfa1b8267058566435d9e93fae7f7/javassist-3.30.2-GA.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/org.javassist/javassist/3.30.2-GA/9fc7ae60f31ef365b07093ba39ab798ded4cd115/javassist-3.30.2-GA-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.34/ec547ef414ab1d2c040118fb9c1c265ada63af14/lombok-1.18.34.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.34/861d5074b9a04a7f1c1e128584a66b2b815fc3d4/lombok-1.18.34-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/io.projectreactor/reactor-core/3.4.27/b9616db55ae5e96173d70b02a7046e67911605c3/reactor-core-3.4.27.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/io.projectreactor/reactor-core/3.4.27/6ea4a35d0ac840655dce001b1d26a9d660a568c6/reactor-core-3.4.27-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/org.reactivestreams/reactive-streams/1.0.4/3864a1320d97d7b045f729a326e1e077661f31b7/reactive-streams-1.0.4.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/org.reactivestreams/reactive-streams/1.0.4/d3cddd3497e618c6d3810ef439f13666f889abe4/reactive-streams-1.0.4-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/io.netty/netty-resolver/4.1.89.Final/686b21bf3488747bc834ee9e60a863f37b71f35e/netty-resolver-4.1.89.Final.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/io.netty/netty-resolver/4.1.89.Final/4249e980378f8f067d0da1ee08e8710a3ca833e6/netty-resolver-4.1.89.Final-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/io.netty/netty-transport-native-unix-common/4.1.89.Final/a7717ed61393d5aad202a92bb02f661ed525bf86/netty-transport-native-unix-common-4.1.89.Final.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/io.netty/netty-transport-native-unix-common/4.1.89.Final/7b34dbabfae0ac6641c74c7396ed984506b1acd9/netty-transport-native-unix-common-4.1.89.Final-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/io.netty/netty-tcnative-classes/2.0.56.Final/df828615a3a4b4b44d7f41aa3d22b744fe7170d/netty-tcnative-classes-2.0.56.Final.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/io.netty/netty-tcnative-classes/2.0.56.Final/54af3de55d50ab78ad7992c29c2becf04694c232/netty-tcnative-classes-2.0.56.Final-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/info.picocli/picocli/4.7.6/77c2cb87814b6a03d431fc856024a9f8ff605ad4/picocli-4.7.6.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/info.picocli/picocli/4.7.6/b85b06a050ffa9fa8c75fd6e386b54718d54edbd/picocli-4.7.6-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/io.netty/netty-codec/4.1.89.Final/f03a649ffa405ca4c802a8bfcc2abfe70ae485ca/netty-codec-4.1.89.Final.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/io.netty/netty-codec/4.1.89.Final/60c2eb76da77d4fe30290d89c41921f84cc4f320/netty-codec-4.1.89.Final-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/io.netty/netty-transport/4.1.89.Final/e7ff320310eafe302c0dfb9690ae7201ab61ead2/netty-transport-4.1.89.Final.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/io.netty/netty-transport/4.1.89.Final/492d4bde8fddf51dc6af4c4e16557cd08096f78e/netty-transport-4.1.89.Final-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/2.0.7/41eb7184ea9d556f23e18b5cb99cad1f8581fc00/slf4j-api-2.0.7.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/2.0.7/f887f95694cd20d51a062446b6e3d09dd02d98ff/slf4j-api-2.0.7-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/io.github.cdimascio/dotenv-java/3.0.2/b0b6071d9680d183c96834c94065c8a963980e3f/dotenv-java-3.0.2.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/io.github.cdimascio/dotenv-java/3.0.2/803562b979ea11368771241c0d570d6a3a968cb4/dotenv-java-3.0.2-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-simple/2.0.7/bfa4d4dad645a5b11c022ae0043bac2df6cf16b5/slf4j-simple-2.0.7.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-simple/2.0.7/3e2e41f62c6f91c9e8783f2b916d82d8981a3e6c/slf4j-simple-2.0.7-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/org.neo4j.driver/neo4j-java-driver/5.6.0/be9f12f5620ac37e17a8fe6a91c4d02d9fed56fa/neo4j-java-driver-5.6.0.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/org.neo4j.driver/neo4j-java-driver/5.6.0/ae9ffcc8f6e00d0bff1511cbbc5929751a0b75a2/neo4j-java-driver-5.6.0-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/io.netty/netty-handler/4.1.89.Final/ced584e9eba5a6b7aad7c6a28a60c13375459f1a/netty-handler-4.1.89.Final.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/io.netty/netty-handler/4.1.89.Final/a8e6a06c82196f31f88c0b1923cb107ee77b1146/netty-handler-4.1.89.Final-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/io.netty/netty-buffer/4.1.89.Final/b1d3dbf69a75eaa8793c7e00cff2851dac9fd725/netty-buffer-4.1.89.Final.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/io.netty/netty-buffer/4.1.89.Final/347dd87e8db15d7f96d713ca994d54f32c798a9d/netty-buffer-4.1.89.Final-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/io.netty/netty-common/4.1.89.Final/c0c80bfe45cc85da5030ea8fc64071e28d0f6f5f/netty-common-4.1.89.Final.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/io.netty/netty-common/4.1.89.Final/44d28ca389e2b8733ca317ca6ebdafa1451ee603/netty-common-4.1.89.Final-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/org.opentest4j/opentest4j/1.2.0/28c11eb91f9b6d8e200631d46e20a7f407f2a046/opentest4j-1.2.0.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/org.opentest4j/opentest4j/1.2.0/41d55b3c2254de9837b4ec8923cbd371b8a7eab5/opentest4j-1.2.0-sources.jar">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/org.assertj/assertj-core/3.24.2/ebbf338e33f893139459ce5df023115971c2786f/assertj-core-3.24.2.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/org.assertj/assertj-core/3.24.2/76c425ccc878f91e347fa3cb0d686772679b66e2/assertj-core-3.24.2-sources.jar">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/org.objenesis/objenesis/3.3/1049c09f1de4331e8193e579448d0916d75b7631/objenesis-3.3.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/org.objenesis/objenesis/3.3/5fef34eeee6816b0ba2170755a8a9db7744990c3/objenesis-3.3-sources.jar">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy/1.15.2/cdcd546c75c1016198529179fd772fef95543d40/byte-buddy-1.15.2.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy/1.15.2/20af5c4e9ddcd48480fca2b7e86c9e02eae13de0/byte-buddy-1.15.2-sources.jar">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-engine/5.8.1/21b86e08aae2720bbf017703669948be96d1388c/junit-jupiter-engine-5.8.1.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-engine/5.8.1/ea87fe3d752e24397f71f347872e79a89c61a704/junit-jupiter-engine-5.8.1-sources.jar">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-commons/1.8.1/1e362cbe6d0f225b066757865e233972557484/junit-platform-commons-1.8.1.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-commons/1.8.1/386b61876dd33d0ef0381189d3c1db9455d99659/junit-platform-commons-1.8.1-sources.jar">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/org.apiguardian/apiguardian-api/1.1.2/a231e0d844d2721b0fa1b238006d15c6ded6842a/apiguardian-api-1.1.2.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/org.apiguardian/apiguardian-api/1.1.2/e0787a997746ac32639e0bf3cb27af8dce8a3428/apiguardian-api-1.1.2-sources.jar">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.15.2/323ea2b871e1aef369c0b0f336259f1cd1a6223/byte-buddy-agent-1.15.2.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.15.2/c529333c2af3549820e348e9b4160231d94c5965/byte-buddy-agent-1.15.2-sources.jar">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-api/5.8.1/6538b88eb8bf8811bc7b6efb5246f835c15e0bfe/junit-jupiter-api-5.8.1.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-api/5.8.1/a3e13f34a2a47fb2c0d7385c5e6e0e8623194061/junit-jupiter-api-5.8.1-sources.jar">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-engine/1.8.1/e6c63bf990dc88a6527b4ed617b23e47048f07e0/junit-platform-engine-1.8.1.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-engine/1.8.1/9d87ea7959823714ad803aa91e0618bf2213b52c/junit-platform-engine-1.8.1-sources.jar">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/mito/.gradle/caches/modules-2/files-2.1/org.mockito/mockito-core/5.14.0/26e554190b5aeb0d9972ecc0ea1e8eafc9d72941/mockito-core-5.14.0.jar" sourcepath="/home/mito/.gradle/caches/modules-2/files-2.1/org.mockito/mockito-core/5.14.0/dcfa70bf6f22f1f16a32fb6d19f1c2173f0269fc/mockito-core-5.14.0-sources.jar">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

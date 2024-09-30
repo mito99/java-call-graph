@@ -1,6 +1,7 @@
 package com.github.mito99.javacallgraph.bytecode;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 
@@ -13,6 +14,8 @@ import lombok.val;
 
 public interface MtCallable {
 
+  String getPackageName();
+
   String getName();
 
   String getClassName();
@@ -22,7 +25,8 @@ public interface MtCallable {
   List<MtCallable> getCalledMethods();
 
   @SneakyThrows
-  static List<MtCallable> getCalledMethods(MtClassPool classPool, MethodInfo methodInfo) {
+  static List<MtCallable> getCalledMethods(
+      MtClassPool classPool, MethodInfo methodInfo) {
     val calledMethods = new ArrayList<MtCallable>();
     val constPool = methodInfo.getConstPool();
     CodeAttribute codeAttribute = methodInfo.getCodeAttribute();
@@ -46,13 +50,13 @@ public interface MtCallable {
       }
 
       int methodRefIndex = codeIterator.u16bitAt(index + 1);
-      String className = constPool.getMethodrefClassName(methodRefIndex);
-      MtClass calledClassInfo = classPool.get(className);
+      val className = constPool.getMethodrefClassName(methodRefIndex);
+      val calledClassInfo = classPool.getClass(className);
 
-      String methodName = constPool.getMethodrefName(methodRefIndex);
-      String methodDescriptor = constPool.getMethodrefType(methodRefIndex);
+      val methodName = constPool.getMethodrefName(methodRefIndex);
+      val methodDescriptor = constPool.getMethodrefType(methodRefIndex);
 
-      MtCallable calledMethod = methodName.equals("<init>")
+      val calledMethod = methodName.equals("<init>")
           ? calledClassInfo.getConstructor(methodDescriptor)
           : calledClassInfo.getMethod(methodName, methodDescriptor);
 
@@ -61,5 +65,14 @@ public interface MtCallable {
       }
     }
     return calledMethods;
+  }
+
+  default String getHashCodeString() {
+    val pkg = this.getPackageName();
+    val className = this.getClassName();
+    val name = this.getName();
+    val desc = this.getDescriptor();
+    val hashString = pkg + "/" + className + "/" + name + "/" + desc;
+    return Base64.getEncoder().encodeToString(hashString.getBytes());
   }
 }
