@@ -61,4 +61,9 @@ public class MtMethod implements MtCallable {
   public MtClass getClassInfo() {
     return this.classInfo;
   }
+
+  @Override
+  public int getModifiers() {
+    return this.ctMethod.getModifiers();
+  }
 }

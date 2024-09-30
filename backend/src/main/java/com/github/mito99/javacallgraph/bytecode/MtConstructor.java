@@ -54,4 +54,9 @@ public class MtConstructor implements MtCallable {
     return this.classInfo;
   }
 
+  @Override
+  public int getModifiers() {
+    return this.ctConstructor.getModifiers();
+  }
+
 }

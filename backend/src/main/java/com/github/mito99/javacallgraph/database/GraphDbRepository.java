@@ -58,10 +58,11 @@ public class GraphDbRepository {
 
   private void upsertClass(Transaction tx, MtClass clazz) {
     tx.run("MERGE (c:Class {hashCode: $hashCode}) " +
-        "ON CREATE SET c.name = $name, c.package = $package",
+        "ON CREATE SET c.name = $name, c.package = $package, c.accessModifier = $accessModifier",
         Values.parameters(
             "name", clazz.getSimpleName(),
             "package", clazz.getPackageName(),
+            "accessModifier", clazz.getAccessModifier(),
             "hashCode", clazz.getHashCodeString()));
   }
 
@@ -116,12 +117,13 @@ public class GraphDbRepository {
   private void upsertMethod(Transaction tx, MtCallable calledMethod) {
     tx.run(
         "MERGE (m:Method {hashCode: $hashCode}) " +
-            "ON CREATE SET m.name = $name, m.class = $class, m.descriptor = $descriptor, m.package = $package",
+            "ON CREATE SET m.name = $name, m.class = $class, m.descriptor = $descriptor, m.package = $package, m.accessModifier = $accessModifier",
         Values.parameters(
             "name", calledMethod.getName(),
             "class", calledMethod.getClassName(),
             "descriptor", calledMethod.getDescriptor(),
             "package", calledMethod.getPackageName(),
+            "accessModifier", calledMethod.getAccessModifier(),
             "hashCode", calledMethod.getHashCodeString()));
   }
 

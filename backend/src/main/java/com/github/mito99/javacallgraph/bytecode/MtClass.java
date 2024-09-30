@@ -80,4 +80,12 @@ public class MtClass {
     var hashString = String.valueOf(hash);
     return Base64.getEncoder().encodeToString(hashString.getBytes());
   }
+
+  public String getAccessModifier() {
+    return MtHelper.getAccessModifier(this.getModifiers());
+  }
+
+  private int getModifiers() {
+    return this.ctClass.getModifiers();
+  }
 }

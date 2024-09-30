@@ -26,6 +26,8 @@ public interface MtCallable {
 
   List<MtCallable> getCalledMethods();
 
+  int getModifiers();
+
   @SneakyThrows
   static List<MtCallable> getCalledMethods(
       MtClassPool classPool, MethodInfo methodInfo) {
@@ -80,5 +82,9 @@ public interface MtCallable {
     val desc = this.getDescriptor();
     val hashString = pkg + "/" + className + "/" + name + "/" + desc;
     return Base64.getEncoder().encodeToString(hashString.getBytes());
+  }
+
+  default String getAccessModifier() {
+    return MtHelper.getAccessModifier(this.getModifiers());
   }
 }
