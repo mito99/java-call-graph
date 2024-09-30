@@ -28,19 +28,22 @@ public class GraphDbRepository {
 
   public void registerClasses(Transaction tx, String moduleName, List<MtClass> classes) {
     for (MtClass clazz : classes) {
-      registerClass(tx, moduleName, clazz);
+      upsertClass(tx, clazz);
+      createModuleClassRelationship(tx, moduleName, clazz);
       registerClassMethods(tx, clazz);
     }
   }
 
-  private void registerClass(Transaction tx, String moduleName, MtClass clazz) {
+  private void upsertClass(Transaction tx, MtClass clazz) {
     tx.run("MERGE (c:Class {hashCode: $hashCode}) " +
         "ON CREATE SET c.name = $name, c.package = $package",
         Values.parameters(
             "name", clazz.getSimpleName(),
             "package", clazz.getPackageName(),
             "hashCode", clazz.getHashCodeString()));
+  }
 
+  private void createModuleClassRelationship(Transaction tx, String moduleName, MtClass clazz) {
     tx.run("MATCH (m:Module {name: $moduleName}) " +
         "MATCH (c:Class {hashCode: $hashCode}) " +
         "CREATE (m)-[:HAS]->(c)",
@@ -52,20 +55,22 @@ public class GraphDbRepository {
   private void registerClassMethods(Transaction tx, MtClass clazz) {
     final var constructors = clazz.getConstructors();
     for (var constructor : constructors) {
-      registerMethods(tx, clazz.getClassName(), constructor);
+      upsertMethod(tx, constructor);
+      createClassMethodRelationship(tx, clazz.getClassName(), constructor);
+      registerCalledMethods(tx, constructor);
     }
 
     final var methods = clazz.getMethods().values();
     for (var methodList : methods) {
       for (MtCallable method : methodList) {
-        registerMethods(tx, clazz.getClassName(), method);
+        upsertMethod(tx, method);
+        createClassMethodRelationship(tx, clazz.getClassName(), method);
+        registerCalledMethods(tx, method);
       }
     }
   }
 
-  public void registerMethods(Transaction tx, String classHashCodeString, MtCallable method) {
-    registerMethodNode(tx, method);
-
+  private void createClassMethodRelationship(Transaction tx, String classHashCodeString, MtCallable method) {
     tx.run(
         "MATCH (c:Class {hashCode: $classHashCode}) " +
             "MATCH (m:Method {hashCode: $hashCode}) " +
@@ -73,20 +78,20 @@ public class GraphDbRepository {
         Values.parameters(
             "classHashCode", classHashCodeString,
             "hashCode", method.getHashCodeString()));
-
-    registerCalledMethods(tx, method);
   }
 
   private void registerCalledMethods(Transaction tx, MtCallable method) {
     final var calledMethods = method.getCalledMethods();
     for (var calledMethod : calledMethods) {
-      registerMethodNode(tx, calledMethod);
+      final var calledClass = calledMethod.getClassInfo();
+      upsertClass(tx, calledClass);
+      upsertMethod(tx, calledMethod);
+      createClassMethodRelationship(tx, calledClass.getHashCodeString(), calledMethod);
       createCallRelationship(tx, method, calledMethod);
     }
   }
 
-  private void registerMethodNode(Transaction tx, MtCallable calledMethod) {
-    // hashCode が一致するものを同じノードとするため、MERGE を使用
+  private void upsertMethod(Transaction tx, MtCallable calledMethod) {
     tx.run(
         "MERGE (m:Method {hashCode: $hashCode}) " +
             "ON CREATE SET m.name = $name, m.class = $class, m.descriptor = $descriptor, m.package = $package",

@@ -56,4 +56,9 @@ public class MtMethod implements MtCallable {
   public String getPackageName() {
     return this.classInfo.getPackageName();
   }
+
+  @Override
+  public MtClass getClassInfo() {
+    return this.classInfo;
+  }
 }

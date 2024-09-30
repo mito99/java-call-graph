@@ -49,4 +49,9 @@ public class MtConstructor implements MtCallable {
     return this.classInfo.getPackageName();
   }
 
+  @Override
+  public MtClass getClassInfo() {
+    return this.classInfo;
+  }
+
 }

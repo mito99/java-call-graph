@@ -22,6 +22,8 @@ public interface MtCallable {
 
   String getDescriptor();
 
+  MtClass getClassInfo();
+
   List<MtCallable> getCalledMethods();
 
   @SneakyThrows
