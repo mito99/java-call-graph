@@ -10,16 +10,22 @@ import com.github.mito99.javacallgraph.bytecode.MtClass;
 import com.github.mito99.javacallgraph.bytecode.MtModule;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 public class GraphDbRepository {
 
   private final GraphDbSession session;
 
   public void registerModule(MtModule module) {
+    log.info("Registering module: {}", module.getName());
     this.session.writeTransaction(tx -> {
       tx.run("CREATE INDEX IF NOT EXISTS FOR (n:Class) ON (n.hashCode)");
       tx.run("CREATE INDEX IF NOT EXISTS FOR (n:Method) ON (n.hashCode)");
+    });
+
+    this.session.writeTransaction(tx -> {
       tx.run("CREATE (m:Module {name: $name, type: $type})",
           Values.parameters(
               "name", module.getName(),
@@ -29,7 +35,11 @@ public class GraphDbRepository {
   }
 
   public void registerClasses(Transaction tx, String moduleName, List<MtClass> classes) {
-    for (MtClass clazz : classes) {
+    final var totalClasses = classes.size();
+    for (var i = 0; i < totalClasses; i++) {
+      final var clazz = classes.get(i);
+      log.info("Registering class: {} ({}/{})", clazz.getClassName(), i + 1, totalClasses);
+
       upsertClass(tx, clazz);
       createModuleClassRelationship(tx, moduleName, clazz);
       registerClassMethods(tx, clazz);
