@@ -35,3 +35,13 @@ tasks.withType(JavaCompile) {
 application {
     mainClass = 'com.github.mito99.javacallgraph.Main'
 }
+
+startShadowScripts {
+    doLast {
+        def windowsScriptFile = file getWindowsScript()
+        def unixScriptFile    = file getUnixScript()
+
+        windowsScriptFile.text = windowsScriptFile.text.replace('%APP_HOME%\\lib', '%APP_HOME%\\libs')
+        unixScriptFile.text = unixScriptFile.text.replace('$APP_HOME/lib', '$APP_HOME/libs')
+    }
+}
