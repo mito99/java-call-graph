@@ -44,10 +44,8 @@ public class MtConfig {
       var matcher = FileSystems.getDefault().getPathMatcher(matcherPattern);
       System.out.println(matcher.matches(Paths.get("src/test/resources/module/libs/text-a.jar")));
 
-      return Files.walk(dir).filter(Files::isRegularFile).peek(p2 -> {
-        System.out.println(p2);
-        System.out.println(matcher.matches(p2.getFileName()));
-      }).filter(p2 -> matcher.matches(p2.getFileName()));
+      return Files.walk(dir).filter(Files::isRegularFile)
+          .filter(p2 -> matcher.matches(p2.getFileName()));
 
     })).map(tryFunction(p -> {
       return p.toUri().toURL();
