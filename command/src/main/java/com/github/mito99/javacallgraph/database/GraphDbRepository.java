@@ -22,8 +22,9 @@ public class GraphDbRepository {
     this.session.writeTransaction(tx -> {
       tx.run("CREATE (m:" + projectPrefix + ":Module {name: $name, type: $type})",
           Values.parameters("name", module.getName(), "type", module.getType()));
-      registerClasses(tx, module.getName(), List.copyOf(module.getClasses().values()));
     });
+
+    registerClasses(session, module.getName(), List.copyOf(module.getClasses().values()));
   }
 
   public void createIndexes() {
@@ -40,15 +41,17 @@ public class GraphDbRepository {
     });
   }
 
-  public void registerClasses(Transaction tx, String moduleName, List<MtClass> classes) {
+  public void registerClasses(GraphDbSession session, String moduleName, List<MtClass> classes) {
     final var totalClasses = classes.size();
     for (var i = 0; i < totalClasses; i++) {
       final var clazz = classes.get(i);
       log.info("Registering class: {} ({}/{})", clazz.getClassName(), i + 1, totalClasses);
 
-      upsertClass(tx, clazz);
-      createModuleClassRelationship(tx, moduleName, clazz);
-      registerClassMethods(tx, clazz);
+      session.writeTransaction(tx -> {
+        upsertClass(tx, clazz);
+        createModuleClassRelationship(tx, moduleName, clazz);
+        registerClassMethods(tx, clazz);
+      });
     }
   }
 

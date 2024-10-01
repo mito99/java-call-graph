@@ -3,14 +3,11 @@ package com.github.mito99.javacallgraph.database;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import com.github.mito99.javacallgraph.bytecode.MtClass;
 import com.github.mito99.javacallgraph.bytecode.MtModule;
 
@@ -46,9 +43,7 @@ public class GraphDbRepositoryTest {
     when(classes.get(0).getHashCodeString()).thenReturn("testHashCode");
 
     // メソッドの呼び出し
-    this.session.writeTransaction(tx -> {
-      repository.registerClasses(tx, "testModule", classes);
-    });
+    repository.registerClasses(this.session, "testModule", classes);
 
     // 検証
     var result = this.session.readTransaction(tx -> {
