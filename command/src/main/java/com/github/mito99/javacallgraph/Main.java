@@ -1,6 +1,7 @@
 package com.github.mito99.javacallgraph;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.Callable;
 import com.github.mito99.javacallgraph.bytecode.MtClassPool;
 import com.github.mito99.javacallgraph.bytecode.MtConfig;
@@ -40,9 +41,13 @@ class RegisterCommand implements Callable<Integer> {
   @Option(names = {"-i", "--include"}, description = "Include classes (正規表現で指定)")
   private String includeClassesRegex;
 
+  @Option(names = {"-j", "--jar"}, description = "Jar file path(with glob pattern)", split = ",")
+  private List<Path> jarFilePaths;
+
   @Override
   public Integer call() {
     MtConfig.getInstance().setIncludeClassesRegex(includeClassesRegex);
+    MtConfig.getInstance().setJarFilePaths(jarFilePaths);
 
     try (var session = GraphDbSession.start()) {
       final var module = MtClassPool.getModule(directoryPath, moduleName, moduleType);

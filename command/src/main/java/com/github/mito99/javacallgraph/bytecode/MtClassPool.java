@@ -1,12 +1,15 @@
 package com.github.mito99.javacallgraph.bytecode;
 
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javassist.ClassPath;
 import javassist.ClassPool;
+import javassist.LoaderClassPath;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -24,6 +27,12 @@ public class MtClassPool {
   public void appendClassPath(String path) {
     this.classPool.appendClassPath(path);
   }
+
+  @SneakyThrows
+  public void appendClassPath(ClassPath path) {
+    this.classPool.appendClassPath(path);
+  }
+
 
   @SneakyThrows
   public Optional<MtClass> getClass(String className) {
@@ -47,6 +56,11 @@ public class MtClassPool {
   public static MtModule getModule(Path path, String moduleName, String moduleType) {
     val classPool = MtClassPool.getDefault();
     classPool.appendClassPath(path.toString());
+
+    val jarFilePaths = MtConfig.getInstance().getJarFilePaths();
+    val urlClassLoader =
+        new URLClassLoader(jarFilePaths, Thread.currentThread().getContextClassLoader());
+    classPool.appendClassPath(new LoaderClassPath(urlClassLoader));
 
     val dir = path.toFile();
     if (!dir.exists()) {
