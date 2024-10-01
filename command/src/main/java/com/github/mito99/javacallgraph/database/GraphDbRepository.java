@@ -1,14 +1,11 @@
 package com.github.mito99.javacallgraph.database;
 
 import java.util.List;
-
 import org.neo4j.driver.Transaction;
 import org.neo4j.driver.Values;
-
 import com.github.mito99.javacallgraph.bytecode.MtCallable;
 import com.github.mito99.javacallgraph.bytecode.MtClass;
 import com.github.mito99.javacallgraph.bytecode.MtModule;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,30 +14,29 @@ import lombok.extern.slf4j.Slf4j;
 public class GraphDbRepository {
 
   private final GraphDbSession session;
+  private final String projectPrefix = "JCG";
 
   public void registerModule(MtModule module) {
     log.info("Registering module: {}", module.getName());
 
     this.session.writeTransaction(tx -> {
-      tx.run("CREATE (m:Module {name: $name, type: $type})",
-          Values.parameters(
-              "name", module.getName(),
-              "type", module.getType()));
+      tx.run("CREATE (m:" + projectPrefix + ":Module {name: $name, type: $type})",
+          Values.parameters("name", module.getName(), "type", module.getType()));
       registerClasses(tx, module.getName(), List.copyOf(module.getClasses().values()));
     });
   }
 
   public void createIndexes() {
     this.session.writeTransaction(tx -> {
-      tx.run("CREATE INDEX IF NOT EXISTS FOR (n:Class) ON (n.hashCode)");
-      tx.run("CREATE INDEX IF NOT EXISTS FOR (n:Method) ON (n.hashCode)");
+      tx.run("CREATE INDEX IF NOT EXISTS FOR (n:" + projectPrefix + ":Class) ON (n.hashCode)");
+      tx.run("CREATE INDEX IF NOT EXISTS FOR (n:" + projectPrefix + ":Method) ON (n.hashCode)");
     });
   }
 
   public void dropIndexes() {
     this.session.writeTransaction(tx -> {
-      tx.run("DROP INDEX IF EXISTS FOR (n:Class) ON (n.hashCode)");
-      tx.run("DROP INDEX IF EXISTS FOR (n:Method) ON (n.hashCode)");
+      tx.run("DROP INDEX IF EXISTS FOR (n:" + projectPrefix + ":Class) ON (n.hashCode)");
+      tx.run("DROP INDEX IF EXISTS FOR (n:" + projectPrefix + ":Method) ON (n.hashCode)");
     });
   }
 
@@ -57,22 +53,17 @@ public class GraphDbRepository {
   }
 
   private void upsertClass(Transaction tx, MtClass clazz) {
-    tx.run("MERGE (c:Class {hashCode: $hashCode}) " +
-        "ON CREATE SET c.name = $name, c.package = $package, c.accessModifier = $accessModifier",
-        Values.parameters(
-            "name", clazz.getSimpleName(),
-            "package", clazz.getPackageName(),
-            "accessModifier", clazz.getAccessModifier(),
-            "hashCode", clazz.getHashCodeString()));
+    tx.run("MERGE (c:" + projectPrefix + ":Class {hashCode: $hashCode}) "
+        + "ON CREATE SET c.name = $name, c.package = $package, c.accessModifier = $accessModifier",
+        Values.parameters("name", clazz.getSimpleName(), "package", clazz.getPackageName(),
+            "accessModifier", clazz.getAccessModifier(), "hashCode", clazz.getHashCodeString()));
   }
 
   private void createModuleClassRelationship(Transaction tx, String moduleName, MtClass clazz) {
-    tx.run("MATCH (m:Module {name: $moduleName}) " +
-        "MATCH (c:Class {hashCode: $hashCode}) " +
-        "CREATE (m)-[:HAS]->(c)",
-        Values.parameters(
-            "moduleName", moduleName,
-            "hashCode", clazz.getHashCodeString()));
+    tx.run(
+        "MATCH (m:" + projectPrefix + ":Module {name: $moduleName}) " + "MATCH (c:" + projectPrefix
+            + ":Class {hashCode: $hashCode}) " + "CREATE (m)-[:HAS]->(c)",
+        Values.parameters("moduleName", moduleName, "hashCode", clazz.getHashCodeString()));
   }
 
   private void registerClassMethods(Transaction tx, MtClass clazz) {
@@ -93,14 +84,13 @@ public class GraphDbRepository {
     }
   }
 
-  private void createClassMethodRelationship(Transaction tx, String classHashCodeString, MtCallable method) {
+  private void createClassMethodRelationship(Transaction tx, String classHashCodeString,
+      MtCallable method) {
     tx.run(
-        "MATCH (c:Class {hashCode: $classHashCode}) " +
-            "MATCH (m:Method {hashCode: $hashCode}) " +
-            "CREATE (c)-[:HAS]->(m)",
-        Values.parameters(
-            "classHashCode", classHashCodeString,
-            "hashCode", method.getHashCodeString()));
+        "MATCH (c:" + projectPrefix + ":Class {hashCode: $classHashCode}) " + "MATCH (m:"
+            + projectPrefix + ":Method {hashCode: $hashCode}) " + "CREATE (c)-[:HAS]->(m)",
+        Values.parameters("classHashCode", classHashCodeString, "hashCode",
+            method.getHashCodeString()));
   }
 
   private void registerCalledMethods(Transaction tx, MtCallable method) {
@@ -115,26 +105,20 @@ public class GraphDbRepository {
   }
 
   private void upsertMethod(Transaction tx, MtCallable calledMethod) {
-    tx.run(
-        "MERGE (m:Method {hashCode: $hashCode}) " +
-            "ON CREATE SET m.name = $name, m.class = $class, m.descriptor = $descriptor, m.package = $package, m.accessModifier = $accessModifier",
-        Values.parameters(
-            "name", calledMethod.getName(),
-            "class", calledMethod.getClassName(),
-            "descriptor", calledMethod.getDescriptor(),
-            "package", calledMethod.getPackageName(),
-            "accessModifier", calledMethod.getAccessModifier(),
-            "hashCode", calledMethod.getHashCodeString()));
+    tx.run("MERGE (m:" + projectPrefix + ":Method {hashCode: $hashCode}) "
+        + "ON CREATE SET m.name = $name, m.class = $class, m.descriptor = $descriptor, m.package = $package, m.accessModifier = $accessModifier",
+        Values.parameters("name", calledMethod.getName(), "class", calledMethod.getClassName(),
+            "descriptor", calledMethod.getDescriptor(), "package", calledMethod.getPackageName(),
+            "accessModifier", calledMethod.getAccessModifier(), "hashCode",
+            calledMethod.getHashCodeString()));
   }
 
   private void createCallRelationship(Transaction tx, MtCallable method, MtCallable calledMethod) {
     tx.run(
-        "MATCH (m1:Method {hashCode: $hashCode1}) " +
-            "MATCH (m2:Method {hashCode: $hashCode2}) " +
-            "CREATE (m1)-[:CALLS]->(m2)",
-        Values.parameters(
-            "hashCode1", method.getHashCodeString(),
-            "hashCode2", calledMethod.getHashCodeString()));
+        "MATCH (m1:" + projectPrefix + ":Method {hashCode: $hashCode1}) " + "MATCH (m2:"
+            + projectPrefix + ":Method {hashCode: $hashCode2}) " + "CREATE (m1)-[:CALLS]->(m2)",
+        Values.parameters("hashCode1", method.getHashCodeString(), "hashCode2",
+            calledMethod.getHashCodeString()));
   }
 
   public void deleteAllNodes() {
