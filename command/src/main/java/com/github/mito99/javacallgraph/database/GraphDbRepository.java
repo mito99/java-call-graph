@@ -28,15 +28,15 @@ public class GraphDbRepository {
 
   public void createIndexes() {
     this.session.writeTransaction(tx -> {
-      tx.run("CREATE INDEX IF NOT EXISTS FOR (n:" + projectPrefix + ":Class) ON (n.hashCode)");
-      tx.run("CREATE INDEX IF NOT EXISTS FOR (n:" + projectPrefix + ":Method) ON (n.hashCode)");
+      tx.run("CREATE INDEX class_hashcode_index IF NOT EXISTS FOR (n:Class) ON (n.hashCode)");
+      tx.run("CREATE INDEX method_hashcode_index IF NOT EXISTS FOR (n:Method) ON (n.hashCode)");
     });
   }
 
   public void dropIndexes() {
     this.session.writeTransaction(tx -> {
-      tx.run("DROP INDEX IF EXISTS FOR (n:" + projectPrefix + ":Class) ON (n.hashCode)");
-      tx.run("DROP INDEX IF EXISTS FOR (n:" + projectPrefix + ":Method) ON (n.hashCode)");
+      tx.run("DROP INDEX class_hashcode_index IF EXISTS");
+      tx.run("DROP INDEX method_hashcode_index IF EXISTS");
     });
   }
 
