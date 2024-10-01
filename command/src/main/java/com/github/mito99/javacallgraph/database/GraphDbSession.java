@@ -2,12 +2,10 @@ package com.github.mito99.javacallgraph.database;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
-
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
-
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.val;
 
@@ -33,6 +31,14 @@ public class GraphDbSession implements AutoCloseable {
     try (var tx = this.session.beginTransaction()) {
       action.accept(tx);
       tx.commit();
+    }
+  }
+
+  public <T> T writeTransaction(Function<Transaction, T> action) {
+    try (var tx = this.session.beginTransaction()) {
+      var result = action.apply(tx);
+      tx.commit();
+      return result;
     }
   }
 

@@ -125,8 +125,17 @@ public class GraphDbRepository {
   }
 
   public void deleteAllNodes() {
-    this.session.writeTransaction(tx -> {
-      tx.run("MATCH (n) DETACH DELETE n");
-    });
+    var hasMoreNodes = true;
+    final var batchSize = 2000;
+    while (hasMoreNodes) {
+      log.info("Deleting nodes in batch of {}", batchSize);
+      hasMoreNodes = this.session.writeTransaction(tx -> {
+        var result = tx.run(
+            "MATCH (n) WITH n LIMIT $batchSize DETACH DELETE n RETURN COUNT(n) AS deletedCount",
+            org.neo4j.driver.Values.parameters("batchSize", batchSize));
+        int deletedCount = result.single().get("deletedCount").asInt();
+        return deletedCount > 0;
+      });
+    }
   }
 }
