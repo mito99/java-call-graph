@@ -91,7 +91,7 @@ public class GraphDbRepository {
       MtCallable method) {
     tx.run(
         "MATCH (c:" + projectPrefix + ":Class {hashCode: $classHashCode}) " + "MATCH (m:"
-            + projectPrefix + ":Method {hashCode: $hashCode}) " + "CREATE (c)-[:HAS]->(m)",
+            + projectPrefix + ":Method {hashCode: $hashCode}) " + "MERGE (c)-[:HAS]->(m)",
         Values.parameters("classHashCode", classHashCodeString, "hashCode",
             method.getHashCodeString()));
   }
