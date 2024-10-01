@@ -65,7 +65,7 @@ public class GraphDbRepository {
   private void createModuleClassRelationship(Transaction tx, String moduleName, MtClass clazz) {
     tx.run(
         "MATCH (m:" + projectPrefix + ":Module {name: $moduleName}) " + "MATCH (c:" + projectPrefix
-            + ":Class {hashCode: $hashCode}) " + "CREATE (m)-[:HAS]->(c)",
+            + ":Class {hashCode: $hashCode}) " + "MERGE (m)-[:HAS]->(c)",
         Values.parameters("moduleName", moduleName, "hashCode", clazz.getHashCodeString()));
   }
 
@@ -119,7 +119,7 @@ public class GraphDbRepository {
   private void createCallRelationship(Transaction tx, MtCallable method, MtCallable calledMethod) {
     tx.run(
         "MATCH (m1:" + projectPrefix + ":Method {hashCode: $hashCode1}) " + "MATCH (m2:"
-            + projectPrefix + ":Method {hashCode: $hashCode2}) " + "CREATE (m1)-[:CALLS]->(m2)",
+            + projectPrefix + ":Method {hashCode: $hashCode2}) " + "MERGE (m1)-[:CALLS]->(m2)",
         Values.parameters("hashCode1", method.getHashCodeString(), "hashCode2",
             calledMethod.getHashCodeString()));
   }
