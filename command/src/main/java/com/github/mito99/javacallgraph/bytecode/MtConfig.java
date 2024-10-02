@@ -5,7 +5,6 @@ import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import lombok.Setter;
@@ -42,7 +41,6 @@ public class MtConfig {
 
       var matcherPattern = "glob:" + file;
       var matcher = FileSystems.getDefault().getPathMatcher(matcherPattern);
-      System.out.println(matcher.matches(Paths.get("src/test/resources/module/libs/text-a.jar")));
 
       return Files.walk(dir).filter(Files::isRegularFile)
           .filter(p2 -> matcher.matches(p2.getFileName()));
