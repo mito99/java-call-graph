@@ -20,7 +20,7 @@ public class GraphDbRepository {
     log.info("Registering module: {}", module.getName());
 
     this.session.writeTransaction(tx -> {
-      tx.run("CREATE (m:" + projectPrefix + ":Module {name: $name, type: $type})",
+      tx.run("MERGE (m:" + projectPrefix + ":Module {name: $name, type: $type})",
           Values.parameters("name", module.getName(), "type", module.getType()));
     });
 
