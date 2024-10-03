@@ -29,15 +29,15 @@ public class GraphDbRepository {
 
   public void createIndexes() {
     this.session.writeTransaction(tx -> {
-      tx.run("CREATE INDEX class_hashcode_index IF NOT EXISTS FOR (n:Class) ON (n.hashCode)");
-      tx.run("CREATE INDEX method_hashcode_index IF NOT EXISTS FOR (n:Method) ON (n.hashCode)");
+      tx.run("CREATE INDEX class_digest_index IF NOT EXISTS FOR (n:Class) ON (n.digest)");
+      tx.run("CREATE INDEX method_digest_index IF NOT EXISTS FOR (n:Method) ON (n.digest)");
     });
   }
 
   public void dropIndexes() {
     this.session.writeTransaction(tx -> {
-      tx.run("DROP INDEX class_hashcode_index IF EXISTS");
-      tx.run("DROP INDEX method_hashcode_index IF EXISTS");
+      tx.run("DROP INDEX class_digest_index IF EXISTS");
+      tx.run("DROP INDEX method_digest_index IF EXISTS");
     });
   }
 
@@ -56,17 +56,17 @@ public class GraphDbRepository {
   }
 
   private void upsertClass(Transaction tx, MtClass clazz) {
-    tx.run("MERGE (c:" + projectPrefix + ":Class {hashCode: $hashCode}) "
+    tx.run("MERGE (c:" + projectPrefix + ":Class {digest: $digest}) "
         + "ON CREATE SET c.name = $name, c.package = $package, c.accessModifier = $accessModifier",
         Values.parameters("name", clazz.getSimpleName(), "package", clazz.getPackageName(),
-            "accessModifier", clazz.getAccessModifier(), "hashCode", clazz.getHashCodeString()));
+            "accessModifier", clazz.getAccessModifier(), "digest", clazz.getDigest()));
   }
 
   private void createModuleClassRelationship(Transaction tx, String moduleName, MtClass clazz) {
     tx.run(
         "MATCH (m:" + projectPrefix + ":Module {name: $moduleName}) " + "MATCH (c:" + projectPrefix
-            + ":Class {hashCode: $hashCode}) " + "MERGE (m)-[:HAS]->(c)",
-        Values.parameters("moduleName", moduleName, "hashCode", clazz.getHashCodeString()));
+            + ":Class {digest: $digest}) " + "MERGE (m)-[:HAS]->(c)",
+        Values.parameters("moduleName", moduleName, "digest", clazz.getDigest()));
   }
 
   private void registerClassMethods(Transaction tx, MtClass clazz) {
@@ -87,13 +87,12 @@ public class GraphDbRepository {
     }
   }
 
-  private void createClassMethodRelationship(Transaction tx, String classHashCodeString,
+  private void createClassMethodRelationship(Transaction tx, String classDigest,
       MtCallable method) {
     tx.run(
-        "MATCH (c:" + projectPrefix + ":Class {hashCode: $classHashCode}) " + "MATCH (m:"
-            + projectPrefix + ":Method {hashCode: $hashCode}) " + "MERGE (c)-[:HAS]->(m)",
-        Values.parameters("classHashCode", classHashCodeString, "hashCode",
-            method.getHashCodeString()));
+        "MATCH (c:" + projectPrefix + ":Class {digest: $classDigest}) " + "MATCH (m:"
+            + projectPrefix + ":Method {digest: $digest}) " + "MERGE (c)-[:HAS]->(m)",
+        Values.parameters("classDigest", classDigest, "digest", method.getDigest()));
   }
 
   private void registerCalledMethods(Transaction tx, MtCallable method) {
@@ -102,26 +101,25 @@ public class GraphDbRepository {
       final var calledClass = calledMethod.getClassInfo();
       upsertClass(tx, calledClass);
       upsertMethod(tx, calledMethod);
-      createClassMethodRelationship(tx, calledClass.getHashCodeString(), calledMethod);
+      createClassMethodRelationship(tx, calledClass.getDigest(), calledMethod);
       createCallRelationship(tx, method, calledMethod);
     }
   }
 
   private void upsertMethod(Transaction tx, MtCallable calledMethod) {
-    tx.run("MERGE (m:" + projectPrefix + ":Method {hashCode: $hashCode}) "
+    tx.run("MERGE (m:" + projectPrefix + ":Method {digest: $digest}) "
         + "ON CREATE SET m.name = $name, m.class = $class, m.descriptor = $descriptor, m.package = $package, m.accessModifier = $accessModifier",
         Values.parameters("name", calledMethod.getName(), "class", calledMethod.getClassName(),
             "descriptor", calledMethod.getDescriptor(), "package", calledMethod.getPackageName(),
-            "accessModifier", calledMethod.getAccessModifier(), "hashCode",
-            calledMethod.getHashCodeString()));
+            "accessModifier", calledMethod.getAccessModifier(), "digest",
+            calledMethod.getDigest()));
   }
 
   private void createCallRelationship(Transaction tx, MtCallable method, MtCallable calledMethod) {
     tx.run(
-        "MATCH (m1:" + projectPrefix + ":Method {hashCode: $hashCode1}) " + "MATCH (m2:"
-            + projectPrefix + ":Method {hashCode: $hashCode2}) " + "MERGE (m1)-[:CALLS]->(m2)",
-        Values.parameters("hashCode1", method.getHashCodeString(), "hashCode2",
-            calledMethod.getHashCodeString()));
+        "MATCH (m1:" + projectPrefix + ":Method {digest: $digest1}) " + "MATCH (m2:" + projectPrefix
+            + ":Method {digest: $digest2}) " + "MERGE (m1)-[:CALLS]->(m2)",
+        Values.parameters("digest1", method.getDigest(), "digest2", calledMethod.getDigest()));
   }
 
   public void deleteAllNodes() {

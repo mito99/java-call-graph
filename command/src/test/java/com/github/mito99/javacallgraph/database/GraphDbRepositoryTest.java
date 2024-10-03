@@ -40,7 +40,7 @@ public class GraphDbRepositoryTest {
     when(module.getClasses()).thenReturn(Map.of("TestClass", classes.get(0)));
     when(classes.get(0).getClassName()).thenReturn("TestClass");
     when(classes.get(0).getPackageName()).thenReturn("testPackage");
-    when(classes.get(0).getHashCodeString()).thenReturn("testHashCode");
+    when(classes.get(0).getDigest()).thenReturn("testHashCode");
 
     // メソッドの呼び出し
     repository.registerClasses(this.session, "testModule", classes);
