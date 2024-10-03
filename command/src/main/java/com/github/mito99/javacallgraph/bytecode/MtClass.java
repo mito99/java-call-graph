@@ -58,16 +58,21 @@ public class MtClass {
 
   @SneakyThrows
   public Optional<MtMethod> getMethodFromSuperClass(String methodName, String methodDescriptor) {
+
+
+
     var thisClass = ctClass;
     while (!thisClass.getName().equals("java.lang.Object")) {
       try {
         val method = thisClass.getMethod(methodName, methodDescriptor);
         return Optional.of(new MtMethod(this, method));
       } catch (NotFoundException e) {
-        thisClass = ctClass.getSuperclass();
-        if (thisClass == null) {
-          break;
-        }
+      }
+
+      try {
+        thisClass = thisClass.getSuperclass();
+      } catch (NotFoundException e) {
+        break;
       }
     }
     return Optional.empty();
