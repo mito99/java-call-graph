@@ -3,5 +3,9 @@
 command/.gradle
 command/build
 command/.classpath
+command/bin
+command/.settings
+command/.project
+command/.factorypath
 
 docker/volumes
