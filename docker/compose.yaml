@@ -1,0 +1,25 @@
+services:
+  neo4j:
+    image: neo4j:latest
+    environment:
+      NEO4J_AUTH: "neo4j/password"
+    ports:
+      - "7474:7474" # ブラウザアクセス用
+      - "7687:7687" # Boltプロトコル用
+    volumes:
+      - neo4j_data:/data
+      - neo4j_import:/var/lib/neo4j/import
+
+volumes:
+  neo4j_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/neo4j/data
+  neo4j_import:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/neo4j/import
