@@ -4,9 +4,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.codec.digest.DigestUtils;
 import javassist.CtClass;
+import javassist.NotFoundException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +55,24 @@ public class MtClass {
     val ctMethod = this.ctClass.getMethod(methodName, methodDescriptor);
     return new MtMethod(this, ctMethod);
   }
+
+  @SneakyThrows
+  public Optional<MtMethod> getMethodFromSuperClass(String methodName, String methodDescriptor) {
+    var thisClass = ctClass;
+    while (!thisClass.getName().equals("java.lang.Object")) {
+      try {
+        val method = thisClass.getMethod(methodName, methodDescriptor);
+        return Optional.of(new MtMethod(this, method));
+      } catch (NotFoundException e) {
+        thisClass = ctClass.getSuperclass();
+        if (thisClass == null) {
+          break;
+        }
+      }
+    }
+    return Optional.empty();
+  }
+
 
   @SneakyThrows
   public MtMethod getMethod(String methodName, String... parameterTypes) {

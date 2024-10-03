@@ -58,12 +58,15 @@ public interface MtCallable {
       val methodName = constPool.getMethodrefName(methodRefIndex);
       val methodDescriptor = constPool.getMethodrefType(methodRefIndex);
 
-      val calledMethod =
-          methodName.equals("<init>") ? calledClassInfo.getConstructor(methodDescriptor)
-              : calledClassInfo.getMethod(methodName, methodDescriptor);
+      if (methodName.equals("<init>")) {
+        val mtConstructor = calledClassInfo.getConstructor(methodDescriptor);
+        calledMethods.add(mtConstructor);
+        continue;
+      }
 
-      if (calledMethod != null) {
-        calledMethods.add(calledMethod);
+      val mtMethodOptiVal = calledClassInfo.getMethodFromSuperClass(methodName, methodDescriptor);
+      if (mtMethodOptiVal.isPresent()) {
+        calledMethods.add(mtMethodOptiVal.get());
       }
     }
     return calledMethods;
