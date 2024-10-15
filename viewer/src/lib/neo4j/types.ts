@@ -1,7 +1,9 @@
 export interface MethodNode {
-  name: string;
-  parameters: string[];
-  returnType: string;
+  methodName: string;
+  className: string;
+  packageName: string;
+  descriptor: string;
+  accessModifier: string;
 }
 
 export interface ClassNode {

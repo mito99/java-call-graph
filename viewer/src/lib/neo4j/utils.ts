@@ -18,15 +18,27 @@ export async function getMethodsByClass(
 ): Promise<MethodNode[]> {
   const query = `
         MATCH (c:Class {name: $className})-[:HAS]->(m:Method)
-        RETURN m
+        RETURN 
+          m.name as methodName, 
+          c.name as className, 
+          c.package as packageName, 
+          m.descriptor as descriptor, 
+          c.accessModifier as accessModifier
     `;
 
   const result = await session.run(query, { className });
-  return result.records
-    .map((record) => record.get("m").properties)
-    .map((method) => ({
-      name: method.name,
-      parameters: method.parameters,
-      returnType: method.returnType,
-    })) as MethodNode[];
+  return result.records.map((record) => {
+    const methodName = record.get("methodName");
+    const packageName = record.get("packageName");
+    const className = record.get("className");
+    const descriptor = record.get("descriptor");
+    const accessModifier = record.get("accessModifier");
+    return {
+      methodName: methodName,
+      className: className,
+      packageName: packageName,
+      descriptor: descriptor,
+      accessModifier: accessModifier,
+    };
+  }) as MethodNode[];
 }

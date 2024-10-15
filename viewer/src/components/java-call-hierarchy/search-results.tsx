@@ -14,8 +14,17 @@ export function SearchResults({ searchResults, handleItemClick }: SearchResultsP
           className="p-4 border-b last:border-b-0 hover:bg-gray-50 cursor-pointer"
           onClick={() => handleItemClick(item)}
         >
-          <h2 className="font-semibold">{item.className}</h2>
-          <p className="text-sm text-gray-600">{item.packageName}</p>
+          <div className='flex flex-row flex-wrap'>
+            <div className='flex-1'>
+              <p>{item.className}</p>
+              <p className='text-sm text-gray-500'>{item.packageName}</p>
+            </div>
+            <div className='flex-1'>
+              <p>{item.methodName}</p>
+              <p className='text-sm text-gray-500'>{item.descriptor}</p>
+              <p className='text-sm text-gray-500'>{item.accessModifier}</p>
+            </div>
+          </div>
         </div>
       ))}
     </div>

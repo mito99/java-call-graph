@@ -13,40 +13,52 @@ export interface SearchResult {
   id: number;
   packageName: string;
   className: string;
+  methodName: string;
+  descriptor: string;
+  accessModifier: string;
 }
 
-const mockSearchResults: SearchResult[] = [
-  { id: 1, packageName: 'com.example', className: 'ExampleClass' },
-  { id: 2, packageName: 'com.example.util', className: 'UtilityClass' },
-  // ... more mock data
-]
+export class SearchQuery {
+  value: string = ""
 
-const mockHierarchy = [
-  { level: 0, name: 'ExampleClass.mainMethod()', modifier: 'public' },
-  { level: 1, name: 'UtilityClass.helperMethod()', modifier: 'private' },
-  { level: 2, name: 'AnotherClass.subMethod()', modifier: 'protected' },
-  { level: 3, name: 'FourthClass.deepMethod()', modifier: 'public' },
-  { level: 4, name: 'FifthClass.deeperMethod()', modifier: 'private' },
-  { level: 5, name: 'SixthClass.evenDeeperMethod()', modifier: 'protected' },
-  { level: 6, name: 'SeventhClass.veryDeepMethod()', modifier: 'public' },
-  // ... more mock hierarchy data
-]
+  constructor(value: string) {
+    this.value = value
+  }
+
+  get packageName(): string {
+    const [fullClassName, ] = this.value.split('#');
+    return fullClassName.split('.').slice(0, -1).join('.');
+  }
+
+  get className(): string {
+    const [fullClassName, ] = this.value.split('#');
+    return fullClassName.split('.').slice(-1)[0];
+  }
+
+  get methodName(): string {
+    const [, methodName] = this.value.split('#');
+    return methodName;
+  }
+}
 
 export function JavaCallHierarchyComponent() {
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState(new SearchQuery(""))
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [selectedItem, setSelectedItem] = useState<SearchResult | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [hopCount, setHopCount] = useState(3)
-  const [isCopied, setIsCopied] = useState(false)
+  // const [isCopied, setIsCopied] = useState(false)
 
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
-      const results = mockSearchResults.filter(item => 
-        item.packageName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        item.className.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      const params = new URLSearchParams();
+      params.append("packageName", searchQuery.packageName);
+      params.append("className", searchQuery.className);
+      params.append("methodName", searchQuery.methodName);
+      const response = await fetch(`/api/neo4j-data?${params.toString()}`);
+      const results = await response.json()
+
       setSearchResults(results)
       if (results.length === 0) {
         toast({
@@ -66,7 +78,7 @@ export function JavaCallHierarchyComponent() {
   }
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value)
+    setSearchQuery(new SearchQuery(e.target.value))
   }
 
   const handleItemClick = (item: SearchResult) => {
@@ -74,37 +86,35 @@ export function JavaCallHierarchyComponent() {
     setIsDialogOpen(true)
   }
 
-  const filteredHierarchy = mockHierarchy.filter(item => item.level < hopCount)
+  // const generateTreeString = (hierarchy: typeof mockHierarchy) => {
+  //   let treeString = ''
+  //   hierarchy.forEach((item, index) => {
+  //     const isLast = index === hierarchy.length - 1 || hierarchy[index + 1].level <= item.level
+  //     const prefix = item.level > 0 ? '│   '.repeat(item.level - 1) : ''
+  //     const connector = item.level > 0 ? (isLast ? '└── ' : '├── ') : ''
+  //     treeString += `${prefix}${connector}${item.modifier} ${item.name}\n`
+  //   })
+  //   return treeString
+  // }
 
-  const generateTreeString = (hierarchy: typeof mockHierarchy) => {
-    let treeString = ''
-    hierarchy.forEach((item, index) => {
-      const isLast = index === hierarchy.length - 1 || hierarchy[index + 1].level <= item.level
-      const prefix = item.level > 0 ? '│   '.repeat(item.level - 1) : ''
-      const connector = item.level > 0 ? (isLast ? '└── ' : '├── ') : ''
-      treeString += `${prefix}${connector}${item.modifier} ${item.name}\n`
-    })
-    return treeString
-  }
-
-  const handleCopyToClipboard = () => {
-    const treeString = generateTreeString(filteredHierarchy)
-    navigator.clipboard.writeText(treeString).then(() => {
-      setIsCopied(true)
-      toast({
-        title: "Copied to clipboard",
-        description: "The tree structure has been copied to your clipboard.",
-      })
-      setTimeout(() => setIsCopied(false), 2000)
-    }).catch(err => {
-      console.error('Failed to copy: ', err)
-      toast({
-        title: "Copy failed",
-        description: "Failed to copy the tree structure. Please try again.",
-        variant: "destructive",
-      })
-    })
-  }
+  // const handleCopyToClipboard = () => {
+  //   const treeString = generateTreeString(filteredHierarchy)
+  //   navigator.clipboard.writeText(treeString).then(() => {
+  //     setIsCopied(true)
+  //     toast({
+  //       title: "Copied to clipboard",
+  //       description: "The tree structure has been copied to your clipboard.",
+  //     })
+  //     setTimeout(() => setIsCopied(false), 2000)
+  //   }).catch(err => {
+  //     console.error('Failed to copy: ', err)
+  //     toast({
+  //       title: "Copy failed",
+  //       description: "Failed to copy the tree structure. Please try again.",
+  //       variant: "destructive",
+  //     })
+  //   })
+  // }
 
   return (
     <div className="container mx-auto p-4">
@@ -143,9 +153,9 @@ export function JavaCallHierarchyComponent() {
         setIsDialogOpen={setIsDialogOpen}
         selectedItem={selectedItem}
         hopCount={hopCount}
-        filteredHierarchy={filteredHierarchy}
-        handleCopyToClipboard={handleCopyToClipboard}
-        isCopied={isCopied}
+        filteredHierarchy={[]}
+        handleCopyToClipboard={()=>{}}
+        isCopied={false}
       />
     </div>
   )

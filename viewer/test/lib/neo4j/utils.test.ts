@@ -24,9 +24,19 @@ describe("getMethodsByClass (Real Neo4j)", () => {
     session = driver.session();
 
     // テストデータを作成
-    await session.run(
-      "CREATE (c:Class {name: 'TestClass'})-[:HAS]->(m:Method {name: 'testMethod', parameters: ['param1', 'param2'], returnType: 'string'})"
-    );
+    await session.run(`
+      CREATE (c:Class {
+        name: 'TestClass',
+        package: 'org.apache.commons.io.function',
+        descriptor: '()V',
+        accessModifier: 'public'
+      })
+        -[:HAS]->
+        (m:Method {
+          name: 'testMethod',
+          descriptor: '()V'
+        })
+      `);
   });
 
   afterAll(async () => {
@@ -35,18 +45,20 @@ describe("getMethodsByClass (Real Neo4j)", () => {
     await driver.close();
   });
 
-  it("should return methods for a given class name", async () => {
+  test("should return methods for a given class name", async () => {
     const methods = await getMethodsByClass(session, "TestClass");
     expect(methods).toEqual([
       {
-        name: "testMethod",
-        parameters: ["param1", "param2"],
-        returnType: "string",
+        methodName: "testMethod",
+        className: "TestClass",
+        packageName: "org.apache.commons.io.function",
+        descriptor: "()V",
+        accessModifier: "public",
       },
     ]);
   });
 
-  it("should return an empty array if no methods are found", async () => {
+  test("should return an empty array if no methods are found", async () => {
     const methods = await getMethodsByClass(session, "NonExistentClass");
     expect(methods).toEqual([]);
   });
