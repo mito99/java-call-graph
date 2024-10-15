@@ -2,7 +2,7 @@
 
 import { Slider } from "@/components/ui/slider"
 import { toast } from "@/hooks/use-toast"
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Label } from "../ui/label"
 import { HierarchyDialog } from "./dialog"
 import { SearchForm } from "./search-form"
@@ -27,17 +27,17 @@ export class SearchQuery {
 
   get packageName(): string {
     const [fullClassName, ] = this.value.split('#');
-    return fullClassName.split('.').slice(0, -1).join('.');
+    return fullClassName.split('.').slice(0, -1).join('.') || "";
   }
 
   get className(): string {
     const [fullClassName, ] = this.value.split('#');
-    return fullClassName.split('.').slice(-1)[0];
+    return fullClassName.split('.').slice(-1)[0] || "";
   }
 
   get methodName(): string {
     const [, methodName] = this.value.split('#');
-    return methodName;
+    return methodName || "";
   }
 }
 
@@ -56,7 +56,7 @@ export function JavaCallHierarchyComponent() {
       params.append("packageName", searchQuery.packageName);
       params.append("className", searchQuery.className);
       params.append("methodName", searchQuery.methodName);
-      const response = await fetch(`/api/neo4j-data?${params.toString()}`);
+      const response = await fetch(`/api/neo4j/methods?${params.toString()}`);
       const results = await response.json()
 
       setSearchResults(results)
@@ -83,8 +83,12 @@ export function JavaCallHierarchyComponent() {
 
   const handleItemClick = (item: SearchResult) => {
     setSelectedItem(item)
-    setIsDialogOpen(true)
   }
+
+
+  useEffect(() => {
+    
+  }, [selectedItem]);
 
   // const generateTreeString = (hierarchy: typeof mockHierarchy) => {
   //   let treeString = ''

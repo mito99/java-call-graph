@@ -46,7 +46,12 @@ describe("getMethodsByClass (Real Neo4j)", () => {
   });
 
   test("should return methods for a given class name", async () => {
-    const methods = await getMethodsByClass(session, "TestClass");
+    const methods = await getMethodsByClass(
+      session,
+      "org.apache.commons.io.function",
+      "TestClass",
+      "testMethod"
+    );
     expect(methods).toEqual([
       {
         methodName: "testMethod",
@@ -59,7 +64,12 @@ describe("getMethodsByClass (Real Neo4j)", () => {
   });
 
   test("should return an empty array if no methods are found", async () => {
-    const methods = await getMethodsByClass(session, "NonExistentClass");
+    const methods = await getMethodsByClass(
+      session,
+      "NonExistentPackage",
+      "NonExistentClass",
+      "NonExistentMethod"
+    );
     expect(methods).toEqual([]);
   });
 });

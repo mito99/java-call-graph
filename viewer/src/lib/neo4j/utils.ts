@@ -14,10 +14,24 @@ export function getSession(): Session {
 
 export async function getMethodsByClass(
   session: Session,
-  className: string
+  packageName: string,
+  className: string,
+  methodName: string
 ): Promise<MethodNode[]> {
+  const where = [];
+  if (packageName) {
+    where.push(`c.package = $packageName`);
+  }
+  if (className) {
+    where.push(`c.name = $className`);
+  }
+  if (methodName) {
+    where.push(`m.name = $methodName`);
+  }
+
   const query = `
-        MATCH (c:Class {name: $className})-[:HAS]->(m:Method)
+        MATCH (c:Class)-[:HAS]->(m:Method)
+        WHERE ${where.join(" AND ")}
         RETURN 
           m.name as methodName, 
           c.name as className, 
@@ -26,7 +40,11 @@ export async function getMethodsByClass(
           c.accessModifier as accessModifier
     `;
 
-  const result = await session.run(query, { className });
+  const result = await session.run(query, {
+    packageName,
+    className,
+    methodName,
+  });
   return result.records.map((record) => {
     const methodName = record.get("methodName");
     const packageName = record.get("packageName");
