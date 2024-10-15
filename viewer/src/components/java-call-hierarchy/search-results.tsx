@@ -14,12 +14,12 @@ export function SearchResults({ searchResults, handleItemClick }: SearchResultsP
           className="p-4 border-b last:border-b-0 hover:bg-gray-50 cursor-pointer"
           onClick={() => handleItemClick(item)}
         >
-          <div className='flex flex-row flex-wrap'>
-            <div className='flex-1'>
+          <div className='flex flex-row'>
+            <div className='flex-1 break-all'>
               <p>{item.className}</p>
               <p className='text-sm text-gray-500'>{item.packageName}</p>
             </div>
-            <div className='flex-1'>
+            <div className='flex-1 break-all'>
               <p>{item.methodName}</p>
               <p className='text-sm text-gray-500'>{item.descriptor}</p>
               <p className='text-sm text-gray-500'>{item.accessModifier}</p>
