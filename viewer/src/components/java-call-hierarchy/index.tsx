@@ -20,6 +20,7 @@ export interface SearchResult {
 
 export class SearchQuery {
   value: string = ""
+  limit: number = 25
 
   constructor(value: string) {
     this.value = value
@@ -56,6 +57,7 @@ export function JavaCallHierarchyComponent() {
       params.append("packageName", searchQuery.packageName);
       params.append("className", searchQuery.className);
       params.append("methodName", searchQuery.methodName);
+      params.append("limit", searchQuery.limit.toString());
       const response = await fetch(`/api/neo4j/methods?${params.toString()}`);
       const results = await response.json()
 
@@ -78,7 +80,17 @@ export function JavaCallHierarchyComponent() {
   }
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(new SearchQuery(e.target.value))
+    setSearchQuery((prevState)=>{
+      prevState.value = e.target.value
+      return prevState
+    })
+  }
+
+  const handleSearchLimitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery((prevState)=>{
+      prevState.limit = parseInt(e.target.value)
+      return prevState
+    })
   }
 
   const handleItemClick = (item: SearchResult) => {
@@ -128,6 +140,7 @@ export function JavaCallHierarchyComponent() {
         searchQuery={searchQuery}
         handleSearch={handleSearch}
         handleSearchInputChange={handleSearchInputChange}
+        handleSearchLimitChange={handleSearchLimitChange}
       />
 
       {searchResults.length > 0 && (

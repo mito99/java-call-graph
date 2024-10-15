@@ -4,6 +4,7 @@ export interface MethodNode {
   packageName: string;
   descriptor: string;
   accessModifier: string;
+  methodDigest: string;
 }
 
 export interface ClassNode {

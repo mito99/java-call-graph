@@ -7,13 +7,13 @@ export async function GET(request: Request) {
     const packageName = searchParams.get("packageName") ?? "";
     const className = searchParams.get("className") ?? "";
     const methodName = searchParams.get("methodName") ?? "";
-    const limit = parseInt(searchParams.get("limit") ?? "25");
+
     const session = getSession();
     const records = await getMethodsByClass(session, {
       packageName,
       className,
       methodName,
-      limit,
+      limit: parseInt(searchParams.get("limit") ?? "25"),
     });
     await session.close();
 

@@ -28,13 +28,14 @@ describe("getMethodsByClass (Real Neo4j)", () => {
       CREATE (c:Class {
         name: 'TestClass',
         package: 'org.apache.commons.io.function',
-        descriptor: '()V',
-        accessModifier: 'public'
+        descriptor: '()V'
       })
         -[:HAS]->
         (m:Method {
           name: 'testMethod',
-          descriptor: '()V'
+          descriptor: '()V',
+          digest: '1234567890',
+          accessModifier: 'public'
         })
       `);
   });
@@ -46,12 +47,12 @@ describe("getMethodsByClass (Real Neo4j)", () => {
   });
 
   test("should return methods for a given class name", async () => {
-    const methods = await getMethodsByClass(
-      session,
-      "org.apache.commons.io.function",
-      "TestClass",
-      "testMethod"
-    );
+    const methods = await getMethodsByClass(session, {
+      packageName: "org.apache.commons.io.function",
+      className: "TestClass",
+      methodName: "testMethod",
+      limit: 10,
+    });
     expect(methods).toEqual([
       {
         methodName: "testMethod",
@@ -59,17 +60,18 @@ describe("getMethodsByClass (Real Neo4j)", () => {
         packageName: "org.apache.commons.io.function",
         descriptor: "()V",
         accessModifier: "public",
+        methodDigest: "1234567890",
       },
     ]);
   });
 
   test("should return an empty array if no methods are found", async () => {
-    const methods = await getMethodsByClass(
-      session,
-      "NonExistentPackage",
-      "NonExistentClass",
-      "NonExistentMethod"
-    );
+    const methods = await getMethodsByClass(session, {
+      packageName: "NonExistentPackage",
+      className: "NonExistentClass",
+      methodName: "NonExistentMethod",
+      limit: 10,
+    });
     expect(methods).toEqual([]);
   });
 });

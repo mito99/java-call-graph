@@ -14,18 +14,21 @@ export function getSession(): Session {
 
 export async function getMethodsByClass(
   session: Session,
-  packageName: string,
-  className: string,
-  methodName: string
+  params: {
+    packageName: string;
+    className: string;
+    methodName: string;
+    limit: number;
+  }
 ): Promise<MethodNode[]> {
   const where = [];
-  if (packageName) {
+  if (params.packageName) {
     where.push(`c.package = $packageName`);
   }
-  if (className) {
+  if (params.className) {
     where.push(`c.name = $className`);
   }
-  if (methodName) {
+  if (params.methodName) {
     where.push(`m.name = $methodName`);
   }
 
@@ -37,13 +40,16 @@ export async function getMethodsByClass(
           c.name as className, 
           c.package as packageName, 
           m.descriptor as descriptor, 
-          c.accessModifier as accessModifier
+          m.accessModifier as accessModifier,
+          m.digest as methodDigest
+        LIMIT toInteger($limit)
     `;
 
   const result = await session.run(query, {
-    packageName,
-    className,
-    methodName,
+    packageName: params.packageName,
+    className: params.className,
+    methodName: params.methodName,
+    limit: Math.trunc(params.limit),
   });
   return result.records.map((record) => {
     const methodName = record.get("methodName");
@@ -51,12 +57,43 @@ export async function getMethodsByClass(
     const className = record.get("className");
     const descriptor = record.get("descriptor");
     const accessModifier = record.get("accessModifier");
+    const methodDigest = record.get("methodDigest");
     return {
       methodName: methodName,
       className: className,
       packageName: packageName,
       descriptor: descriptor,
       accessModifier: accessModifier,
+      methodDigest: methodDigest,
+    };
+  }) as MethodNode[];
+}
+
+export async function getCallingMethodsByDigest(
+  session: Session,
+  methodDigest: string
+): Promise<MethodNode[]> {
+  const query = `
+        MATCH (m:Method)-[:CALLS]->(called:Method)
+        WHERE m.digest = $methodDigest
+        RETURN 
+          called.name as methodName, 
+          called.descriptor as descriptor, 
+          called.accessModifier as accessModifier,
+          called.digest as methodDigest
+    `;
+
+  const result = await session.run(query, { methodDigest });
+  return result.records.map((record) => {
+    const methodName = record.get("methodName");
+    const descriptor = record.get("descriptor");
+    const accessModifier = record.get("accessModifier");
+    const methodDigest = record.get("methodDigest");
+    return {
+      methodName: methodName,
+      descriptor: descriptor,
+      accessModifier: accessModifier,
+      methodDigest: methodDigest,
     };
   }) as MethodNode[];
 }

@@ -8,9 +8,10 @@ interface SearchFormProps {
   searchQuery: SearchQuery;
   handleSearch: (e: FormEvent<HTMLFormElement>) => void;
   handleSearchInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  handleSearchLimitChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-export function SearchForm({ searchQuery, handleSearch, handleSearchInputChange}: SearchFormProps) {
+export function SearchForm({ searchQuery, handleSearch, handleSearchInputChange, handleSearchLimitChange}: SearchFormProps) {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     handleSearch(e);
@@ -22,10 +23,17 @@ export function SearchForm({ searchQuery, handleSearch, handleSearchInputChange}
         <Input
           type="text"
           placeholder="Search by package or class name"
-          value={searchQuery.value}
+          defaultValue={searchQuery.value}
           onChange={handleSearchInputChange}
           className="flex-grow"
           aria-label="Search query"
+        />
+        <Input
+          type="text"
+          placeholder="Limit"
+          defaultValue={searchQuery.limit}
+          onChange={handleSearchLimitChange}
+          className="w-24"
         />
         <Button type="submit">
           <Search className="mr-2 h-4 w-4" /> Search
