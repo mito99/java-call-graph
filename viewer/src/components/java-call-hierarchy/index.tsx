@@ -10,7 +10,7 @@ import { SearchResults } from "./search-results"
 
 // モックデータ
 export interface SearchResult {
-  id: number;
+  methodDigest: string;
   packageName: string;
   className: string;
   methodName: string;
@@ -48,7 +48,6 @@ export function JavaCallHierarchyComponent() {
   const [selectedItem, setSelectedItem] = useState<SearchResult | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [hopCount, setHopCount] = useState(3)
-  // const [isCopied, setIsCopied] = useState(false)
 
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -97,40 +96,20 @@ export function JavaCallHierarchyComponent() {
     setSelectedItem(item)
   }
 
-
   useEffect(() => {
-    
-  }, [selectedItem]);
+    const fetchCallingMethods = async () => {
+      const params = new URLSearchParams();
+      params.append("methodDigest", selectedItem?.methodDigest ?? "");
+      params.append("hopCount", hopCount.toString()); 
+      const response = await fetch(`/api/neo4j/called?${params.toString()}`);
+      const methods = await response.json()
+      return methods
+    }
+    if (!selectedItem) return;
 
-  // const generateTreeString = (hierarchy: typeof mockHierarchy) => {
-  //   let treeString = ''
-  //   hierarchy.forEach((item, index) => {
-  //     const isLast = index === hierarchy.length - 1 || hierarchy[index + 1].level <= item.level
-  //     const prefix = item.level > 0 ? '│   '.repeat(item.level - 1) : ''
-  //     const connector = item.level > 0 ? (isLast ? '└── ' : '├── ') : ''
-  //     treeString += `${prefix}${connector}${item.modifier} ${item.name}\n`
-  //   })
-  //   return treeString
-  // }
-
-  // const handleCopyToClipboard = () => {
-  //   const treeString = generateTreeString(filteredHierarchy)
-  //   navigator.clipboard.writeText(treeString).then(() => {
-  //     setIsCopied(true)
-  //     toast({
-  //       title: "Copied to clipboard",
-  //       description: "The tree structure has been copied to your clipboard.",
-  //     })
-  //     setTimeout(() => setIsCopied(false), 2000)
-  //   }).catch(err => {
-  //     console.error('Failed to copy: ', err)
-  //     toast({
-  //       title: "Copy failed",
-  //       description: "Failed to copy the tree structure. Please try again.",
-  //       variant: "destructive",
-  //     })
-  //   })
-  // }
+    const result = fetchCallingMethods();
+    console.log(result)
+  }, [selectedItem, hopCount]);
 
   return (
     <div className="container mx-auto p-4">

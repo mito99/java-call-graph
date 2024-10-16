@@ -8,7 +8,10 @@ describe("utils", () => {
   });
 });
 import neo4j, { Driver, Session } from "neo4j-driver";
-import { getMethodsByClass } from "../../../src/lib/neo4j/utils";
+import {
+  getCallingMethodsByDigest,
+  getMethodsByClass,
+} from "../../../src/lib/neo4j/utils";
 
 // リアルなNeo4jインスタンスに対してテストを実行する場合.
 describe("getMethodsByClass (Real Neo4j)", () => {
@@ -71,6 +74,100 @@ describe("getMethodsByClass (Real Neo4j)", () => {
       className: "NonExistentClass",
       methodName: "NonExistentMethod",
       limit: 10,
+    });
+    expect(methods).toEqual([]);
+  });
+});
+
+describe("getCallingMethodsByDigest (Real Neo4j)", () => {
+  let session: Session;
+  let driver: Driver;
+
+  beforeAll(async () => {
+    // Neo4jがローカルで起動していることを確認してください。
+    driver = neo4j.driver(
+      "bolt://localhost:7687",
+      neo4j.auth.basic("neo4j", "password")
+    );
+    session = driver.session();
+
+    // テストデータを作成
+    await session.run(`
+      CREATE (m1:Method {
+        name: 'callerMethod',
+        descriptor: '()V',
+        digest: 'digest1',
+        accessModifier: 'public',
+        class: 'CallerClass',
+        package: 'org.example'
+      }),
+      (m2:Method {
+        name: 'calledMethod',
+        descriptor: '()V',
+        digest: 'digest2',
+        accessModifier: 'public',
+        class: 'CalledClass',
+        package: 'org.example'
+      }),
+      (m3:Method {
+        name: 'calledMethod',
+        descriptor: '()V',
+        digest: 'digest3',
+        accessModifier: 'public',
+        class: 'CalledClass',
+        package: 'org.example'
+      }),      
+      (m1)<-[:CALLS]-(m2),
+      (m1)<-[:CALLS]-(m3)
+    `);
+  });
+
+  afterAll(async () => {
+    // テストデータの削除
+    await session.run(`
+      MATCH (m:Method) 
+        WHERE m.digest IN ['digest1', 'digest2', 'digest3']
+        DETACH DELETE m
+    `);
+    await driver.close();
+  });
+
+  test("should return calling methods for a given method digest", async () => {
+    const methods = await getCallingMethodsByDigest(session, {
+      methodDigest: "digest1",
+      hopCount: 1,
+    });
+
+    const filterdMethods = methods
+      .flat()
+      .filter((method) => method.methodDigest !== "digest1")
+      .sort((a, b) => a.methodDigest.localeCompare(b.methodDigest));
+
+    expect(filterdMethods.length).toBe(2);
+    expect(filterdMethods).toEqual([
+      {
+        methodName: "calledMethod",
+        descriptor: "()V",
+        accessModifier: "public",
+        methodDigest: "digest2",
+        className: "CalledClass",
+        packageName: "org.example",
+      },
+      {
+        methodName: "calledMethod",
+        descriptor: "()V",
+        accessModifier: "public",
+        methodDigest: "digest3",
+        className: "CalledClass",
+        packageName: "org.example",
+      },
+    ]);
+  });
+
+  test("should return an empty array if no calling methods are found", async () => {
+    const methods = await getCallingMethodsByDigest(session, {
+      methodDigest: "nonExistentDigest",
+      hopCount: 1,
     });
     expect(methods).toEqual([]);
   });

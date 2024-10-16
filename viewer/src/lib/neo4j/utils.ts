@@ -71,29 +71,34 @@ export async function getMethodsByClass(
 
 export async function getCallingMethodsByDigest(
   session: Session,
-  methodDigest: string
-): Promise<MethodNode[]> {
+  params: {
+    methodDigest: string;
+    hopCount: number;
+  }
+): Promise<MethodNode[][]> {
   const query = `
-        MATCH (m:Method)-[:CALLS]->(called:Method)
-        WHERE m.digest = $methodDigest
-        RETURN 
-          called.name as methodName, 
-          called.descriptor as descriptor, 
-          called.accessModifier as accessModifier,
-          called.digest as methodDigest
-    `;
+    MATCH path = (m1:Method{digest: $methodDigest})
+      <-[:CALLS*1..${params.hopCount}]-(m2:Method)
+    WHERE none(n in nodes(path)[2..-1] WHERE n = last(nodes(path)))
+    WITH path,
+      [n in nodes(path) WHERE n:Method | {
+        methodName: n.name,
+        descriptor: n.descriptor,
+        accessModifier: n.accessModifier,
+        methodDigest: n.digest,
+        className: n.class,
+        packageName: n.package
+      }] AS methods
+    RETURN 
+      methods
+  `;
 
-  const result = await session.run(query, { methodDigest });
-  return result.records.map((record) => {
-    const methodName = record.get("methodName");
-    const descriptor = record.get("descriptor");
-    const accessModifier = record.get("accessModifier");
-    const methodDigest = record.get("methodDigest");
-    return {
-      methodName: methodName,
-      descriptor: descriptor,
-      accessModifier: accessModifier,
-      methodDigest: methodDigest,
-    };
-  }) as MethodNode[];
+  const result = await session.run(query, {
+    methodDigest: params.methodDigest,
+  });
+  const methods = result.records.map((record) => {
+    const methods = record.get("methods") as MethodNode[];
+    return methods;
+  });
+  return methods;
 }

@@ -1,19 +1,16 @@
-import { getMethodsByClass, getSession } from "@/lib/neo4j";
+import { getCallingMethodsByDigest, getSession } from "@/lib/neo4j";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const packageName = searchParams.get("packageName") ?? "";
-    const className = searchParams.get("className") ?? "";
-    const methodName = searchParams.get("methodName") ?? "";
+    const methodDigest = searchParams.get("methodDigest") ?? "";
+    const hopCount = parseInt(searchParams.get("hopCount") ?? "5");
 
     const session = getSession();
-    const records = await getMethodsByClass(session, {
-      packageName,
-      className,
-      methodName,
-      limit: parseInt(searchParams.get("limit") ?? "25"),
+    const records = await getCallingMethodsByDigest(session, {
+      methodDigest,
+      hopCount,
     });
     await session.close();
 
