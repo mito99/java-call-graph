@@ -45,7 +45,7 @@ const MethodNode: React.FC<{ method: CallingMethodTree; depth: number }> = ({ me
         <div className="ml-4 mt-2 text-sm">
           <p><span className="font-semibold">Package:</span> {method.packageName}</p>
           <p><span className="font-semibold">Access Modifier:</span> {method.accessModifier}</p>
-          <p><span className="font-semibold">Descriptor:</span> {method.descriptor}</p>
+          <p><span className="font-semibold break-all">Descriptor:</span> {method.descriptor}</p>
           <p><span className="font-semibold">Method Digest:</span> {method.methodDigest}</p>
         </div>
       )}
@@ -73,7 +73,10 @@ export function HierarchyDialog({
             <span className="font-semibold">{selectedItem?.packageName}</span>
             <span className="text-gray-500">{selectedItem?.moduleName}</span>
           </DialogDescription>
-          <DialogTitle>{selectedItem?.className}#{selectedItem?.methodName} - {selectedItem?.descriptor}</DialogTitle>
+          <DialogTitle>
+            <p>{selectedItem?.className}#{selectedItem?.methodName}</p>
+            <p className="text-gray-500 text-sm break-all">{selectedItem?.descriptor}</p>
+          </DialogTitle>
         </DialogHeader>
         <div className="p-1 overflow-y-auto">
           {callingMethodTree && (
