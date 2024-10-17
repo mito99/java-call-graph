@@ -1,5 +1,5 @@
-import neo4j, { Driver, Session } from "neo4j-driver";
-import { MethodNode } from "./types";
+import neo4j, { Driver, Record, Session } from "neo4j-driver";
+import { CallingMethodTree, MethodNode } from "./types";
 
 // Neo4j ドライバーの初期化
 const driver: Driver = neo4j.driver(
@@ -75,30 +75,97 @@ export async function getCallingMethodsByDigest(
     methodDigest: string;
     hopCount: number;
   }
-): Promise<MethodNode[][]> {
+): Promise<CallingMethodTree | null> {
   const query = `
     MATCH path = (m1:Method{digest: $methodDigest})
       <-[:CALLS*1..${params.hopCount}]-(m2:Method)
+      OPTIONAL MATCH (m2) <-[:HAS*1..]-(md:Module)
     WHERE none(n in nodes(path)[2..-1] WHERE n = last(nodes(path)))
-    WITH path,
+    WITH path, md,
       [n in nodes(path) WHERE n:Method | {
         methodName: n.name,
         descriptor: n.descriptor,
         accessModifier: n.accessModifier,
         methodDigest: n.digest,
         className: n.class,
-        packageName: n.package
+        packageName: n.package,
+        moduleName: coalesce(md.name, '')
       }] AS methods
     RETURN 
       methods
   `;
-
   const result = await session.run(query, {
     methodDigest: params.methodDigest,
   });
-  const methods = result.records.map((record) => {
-    const methods = record.get("methods") as MethodNode[];
-    return methods;
-  });
-  return methods;
+
+  if (result.records.length === 0) {
+    return null;
+  }
+
+  const callingMethodNodes = mapCallingMethodNodes(result.records);
+  return mergeCallingMethodTrees(callingMethodNodes);
+
+  //-- 以下、ヘルパー関数
+  function mapCallingMethodNodes(records: Record[]): CallingMethodTree[] {
+    return records.map((record): CallingMethodTree => {
+      const methodNodes = record.get("methods").map((method: MethodNode) => ({
+        methodName: method.methodName,
+        descriptor: method.descriptor,
+        accessModifier: method.accessModifier,
+        methodDigest: method.methodDigest,
+        className: method.className,
+        packageName: method.packageName,
+        children: {},
+      }));
+
+      const [rootNode, ...restNodes] = methodNodes;
+      restNodes.reduce(
+        (
+          acc: { [key: string]: CallingMethodTree },
+          node: CallingMethodTree
+        ) => {
+          acc[node.methodDigest] = node;
+          return node.children;
+        },
+        rootNode.children
+      );
+      return rootNode;
+    });
+  }
+
+  function mergeCallingMethodTrees(
+    callingMethodNodes: CallingMethodTree[]
+  ): CallingMethodTree {
+    const mergeTrees = (
+      tree1: CallingMethodTree,
+      tree2: CallingMethodTree
+    ): CallingMethodTree => {
+      if (!tree1) return tree2;
+      if (!tree2) return tree1;
+
+      if (tree1.children && tree2.children) {
+        for (const key in tree2.children) {
+          if (tree1.children[key]) {
+            tree1.children[key] = mergeTrees(
+              tree1.children[key],
+              tree2.children[key]
+            );
+          } else {
+            tree1.children[key] = tree2.children[key];
+          }
+        }
+      } else if (tree2.children) {
+        tree1.children = tree2.children;
+      }
+      return tree1;
+    };
+
+    return callingMethodNodes.reduce(
+      (acc: CallingMethodTree, node: CallingMethodTree) => {
+        mergeTrees(acc, node);
+        return acc;
+      },
+      callingMethodNodes[0]
+    );
+  }
 }

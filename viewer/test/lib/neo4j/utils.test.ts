@@ -138,37 +138,17 @@ describe("getCallingMethodsByDigest (Real Neo4j)", () => {
       hopCount: 1,
     });
 
-    const filterdMethods = methods
-      .flat()
-      .filter((method) => method.methodDigest !== "digest1")
-      .sort((a, b) => a.methodDigest.localeCompare(b.methodDigest));
-
-    expect(filterdMethods.length).toBe(2);
-    expect(filterdMethods).toEqual([
-      {
-        methodName: "calledMethod",
-        descriptor: "()V",
-        accessModifier: "public",
-        methodDigest: "digest2",
-        className: "CalledClass",
-        packageName: "org.example",
-      },
-      {
-        methodName: "calledMethod",
-        descriptor: "()V",
-        accessModifier: "public",
-        methodDigest: "digest3",
-        className: "CalledClass",
-        packageName: "org.example",
-      },
-    ]);
+    expect(methods).not.toBeNull();
+    expect(methods?.methodDigest).toBe("digest1");
+    expect(methods?.children["digest2"]).toBeDefined();
+    expect(methods?.children["digest3"]).toBeDefined();
   });
 
-  test("should return an empty array if no calling methods are found", async () => {
+  test("should return null if no calling methods are found", async () => {
     const methods = await getCallingMethodsByDigest(session, {
       methodDigest: "nonExistentDigest",
       hopCount: 1,
     });
-    expect(methods).toEqual([]);
+    expect(methods).toEqual(null);
   });
 });

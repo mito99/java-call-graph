@@ -2,7 +2,8 @@
 
 import { Slider } from "@/components/ui/slider"
 import { toast } from "@/hooks/use-toast"
-import { useEffect, useState } from 'react'
+import { CallingMethodTree } from "@/lib/neo4j"
+import { useState } from 'react'
 import { Label } from "../ui/label"
 import { HierarchyDialog } from "./dialog"
 import { SearchForm } from "./search-form"
@@ -12,6 +13,7 @@ import { SearchResults } from "./search-results"
 export interface SearchResult {
   methodDigest: string;
   packageName: string;
+  moduleName: string;
   className: string;
   methodName: string;
   descriptor: string;
@@ -48,7 +50,7 @@ export function JavaCallHierarchyComponent() {
   const [selectedItem, setSelectedItem] = useState<SearchResult | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [hopCount, setHopCount] = useState(3)
-
+  const [callingMethodTree, setCallingMethodTree] = useState<CallingMethodTree | null>(null)
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
@@ -92,24 +94,19 @@ export function JavaCallHierarchyComponent() {
     })
   }
 
-  const handleItemClick = (item: SearchResult) => {
-    setSelectedItem(item)
+  const handleItemClick = async (item: SearchResult) => {
+    setSelectedItem(item);
+
+    const params = new URLSearchParams();
+    params.append("methodDigest", item.methodDigest ?? "");
+    params.append("hopCount", hopCount.toString()); 
+    const response = await fetch(`/api/neo4j/called?${params.toString()}`);
+    const methods = await response.json()
+    console.log(methods);
+
+    setCallingMethodTree(methods as CallingMethodTree);
+    setIsDialogOpen(true);
   }
-
-  useEffect(() => {
-    const fetchCallingMethods = async () => {
-      const params = new URLSearchParams();
-      params.append("methodDigest", selectedItem?.methodDigest ?? "");
-      params.append("hopCount", hopCount.toString()); 
-      const response = await fetch(`/api/neo4j/called?${params.toString()}`);
-      const methods = await response.json()
-      return methods
-    }
-    if (!selectedItem) return;
-
-    const result = fetchCallingMethods();
-    console.log(result)
-  }, [selectedItem, hopCount]);
 
   return (
     <div className="container mx-auto p-4">
@@ -145,13 +142,10 @@ export function JavaCallHierarchyComponent() {
       />
 
       <HierarchyDialog 
+        callingMethodTree={callingMethodTree}
         isDialogOpen={isDialogOpen}
         setIsDialogOpen={setIsDialogOpen}
         selectedItem={selectedItem}
-        hopCount={hopCount}
-        filteredHierarchy={[]}
-        handleCopyToClipboard={()=>{}}
-        isCopied={false}
       />
     </div>
   )
