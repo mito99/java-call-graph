@@ -31,6 +31,9 @@ export async function getMethodsByClass(
   if (params.methodName) {
     where.push(`m.name = $methodName`);
   }
+  if (where.length === 0) {
+    return [];
+  }
 
   const query = `
         MATCH (c:Class)-[:HAS]->(m:Method)

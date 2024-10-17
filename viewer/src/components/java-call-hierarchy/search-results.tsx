@@ -8,7 +8,7 @@ interface SearchResultsProps {
 export function SearchResults({ searchResults, handleItemClick }: SearchResultsProps) {
   return (
     <div className="bg-white shadow rounded-lg">
-      {searchResults.map((item) => (
+      {searchResults && searchResults.map((item) => (
         <div
           key={item.methodDigest}
           className="p-4 border-b last:border-b-0 hover:bg-gray-50 cursor-pointer"
