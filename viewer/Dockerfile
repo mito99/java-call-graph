@@ -1,6 +1,3 @@
-ARG ORACLE_VER=12.2.0.1.0
-ARG ORACLE_SHORT_VER=12_2
-
 FROM node:20-alpine AS build
 
 WORKDIR /app
