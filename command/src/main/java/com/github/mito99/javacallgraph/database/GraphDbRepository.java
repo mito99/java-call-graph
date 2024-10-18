@@ -1,12 +1,16 @@
 package com.github.mito99.javacallgraph.database;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import org.neo4j.driver.Transaction;
 import org.neo4j.driver.Values;
 import com.github.mito99.javacallgraph.bytecode.MtCallable;
 import com.github.mito99.javacallgraph.bytecode.MtClass;
+import com.github.mito99.javacallgraph.bytecode.MtConstructor;
 import com.github.mito99.javacallgraph.bytecode.MtModule;
+import com.google.common.collect.ImmutableList;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -24,7 +28,7 @@ public class GraphDbRepository {
           Values.parameters("name", module.getName(), "type", module.getType()));
     });
 
-    registerClasses(session, module.getName(), List.copyOf(module.getClasses().values()));
+    registerClasses(session, module.getName(), ImmutableList.copyOf(module.getClasses().values()));
   }
 
   public void createIndexes() {
@@ -42,9 +46,9 @@ public class GraphDbRepository {
   }
 
   public void registerClasses(GraphDbSession session, String moduleName, List<MtClass> classes) {
-    final var totalClasses = classes.size();
-    for (var i = 0; i < totalClasses; i++) {
-      final var clazz = classes.get(i);
+    val totalClasses = classes.size();
+    for (int i = 0; i < totalClasses; i++) {
+      val clazz = classes.get(i);
       log.info("Registering class: {} ({}/{})", clazz.getClassName(), i + 1, totalClasses);
 
       session.writeTransaction(tx -> {
@@ -70,20 +74,19 @@ public class GraphDbRepository {
   }
 
   private void registerClassMethods(Transaction tx, MtClass clazz) {
-    final var constructors = clazz.getConstructors();
-    for (var constructor : constructors) {
+    val constructors = clazz.getConstructors();
+    for (MtConstructor constructor : constructors) {
       upsertMethod(tx, constructor);
       createClassMethodRelationship(tx, clazz.getClassName(), constructor);
       registerCalledMethods(tx, constructor);
     }
 
-    final var methods = clazz.getMethods().values();
-    for (var methodList : methods) {
-      for (MtCallable method : methodList) {
-        upsertMethod(tx, method);
-        createClassMethodRelationship(tx, clazz.getClassName(), method);
-        registerCalledMethods(tx, method);
-      }
+    val methods =
+        clazz.getMethods().values().stream().flatMap(List::stream).collect(Collectors.toList());
+    for (MtCallable method : methods) {
+      upsertMethod(tx, method);
+      createClassMethodRelationship(tx, clazz.getClassName(), method);
+      registerCalledMethods(tx, method);
     }
   }
 
@@ -96,9 +99,9 @@ public class GraphDbRepository {
   }
 
   private void registerCalledMethods(Transaction tx, MtCallable method) {
-    final var calledMethods = method.getCalledMethods();
-    for (var calledMethod : calledMethods) {
-      final var calledClass = calledMethod.getClassInfo();
+    val calledMethods = method.getCalledMethods();
+    for (MtCallable calledMethod : calledMethods) {
+      val calledClass = calledMethod.getClassInfo();
       upsertClass(tx, calledClass);
       upsertMethod(tx, calledMethod);
       createClassMethodRelationship(tx, calledClass.getDigest(), calledMethod);
@@ -123,15 +126,15 @@ public class GraphDbRepository {
   }
 
   public void deleteAllNodes() {
-    var hasMoreNodes = true;
-    final var batchSize = 2000;
+    boolean hasMoreNodes = true;
+    val batchSize = 2000;
     while (hasMoreNodes) {
       log.info("Deleting nodes in batch of {}", batchSize);
       hasMoreNodes = this.session.writeTransaction(tx -> {
-        var result = tx.run(
+        val result = tx.run(
             "MATCH (n) WITH n LIMIT $batchSize DETACH DELETE n RETURN COUNT(n) AS deletedCount",
             org.neo4j.driver.Values.parameters("batchSize", batchSize));
-        int deletedCount = result.single().get("deletedCount").asInt();
+        val deletedCount = result.single().get("deletedCount").asInt();
         return deletedCount > 0;
       });
     }

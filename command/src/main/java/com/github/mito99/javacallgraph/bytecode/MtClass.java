@@ -58,10 +58,7 @@ public class MtClass {
 
   @SneakyThrows
   public Optional<MtMethod> getMethodFromSuperClass(String methodName, String methodDescriptor) {
-
-
-
-    var thisClass = ctClass;
+    CtClass thisClass = ctClass;
     while (!thisClass.getName().equals("java.lang.Object")) {
       try {
         val method = thisClass.getMethod(methodName, methodDescriptor);
@@ -82,7 +79,7 @@ public class MtClass {
   @SneakyThrows
   public MtMethod getMethod(String methodName, String... parameterTypes) {
     return getMethods().get(methodName).stream().filter(method -> {
-      final var methodParameterTypes = method.getParameterTypes();
+      val methodParameterTypes = method.getParameterTypes();
       return Arrays.equals(methodParameterTypes, parameterTypes);
     }).findFirst().orElseThrow(() -> new NoSuchElementException("Method not found: " + methodName));
   }

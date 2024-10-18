@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.Setter;
+import lombok.val;
 
 public class MtConfig {
 
@@ -37,11 +38,11 @@ public class MtConfig {
     }
 
     return jarFilePaths.stream().flatMap(tryFunction(p -> {
-      final var dir = p.toAbsolutePath().getParent();
-      final var file = p.getFileName();
+      val dir = p.toAbsolutePath().getParent();
+      val file = p.getFileName();
 
-      var matcherPattern = "glob:" + file;
-      var matcher = FileSystems.getDefault().getPathMatcher(matcherPattern);
+      val matcherPattern = "glob:" + file;
+      val matcher = FileSystems.getDefault().getPathMatcher(matcherPattern);
 
       return Files.walk(dir).filter(Files::isRegularFile)
           .filter(p2 -> matcher.matches(p2.getFileName()));

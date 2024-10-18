@@ -7,6 +7,7 @@ import com.github.mito99.javacallgraph.bytecode.MtClassPool;
 import com.github.mito99.javacallgraph.bytecode.MtConfig;
 import com.github.mito99.javacallgraph.database.GraphDbRepository;
 import com.github.mito99.javacallgraph.database.GraphDbSession;
+import lombok.val;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -49,9 +50,9 @@ class RegisterCommand implements Callable<Integer> {
     MtConfig.getInstance().setIncludeClassesRegex(includeClassesRegex);
     MtConfig.getInstance().setJarFilePaths(jarFilePaths);
 
-    try (var session = GraphDbSession.start()) {
-      final var module = MtClassPool.getModule(directoryPath, moduleName, moduleType);
-      final var reqpos = new GraphDbRepository(session);
+    try (val session = GraphDbSession.start()) {
+      val module = MtClassPool.getModule(directoryPath, moduleName, moduleType);
+      val reqpos = new GraphDbRepository(session);
       reqpos.registerModule(module);
       return 0;
     } catch (Exception e) {
@@ -68,8 +69,8 @@ class CleanupCommand implements Callable<Integer> {
 
   @Override
   public Integer call() {
-    try (var session = GraphDbSession.start()) {
-      final var reqpos = new GraphDbRepository(session);
+    try (val session = GraphDbSession.start()) {
+      val reqpos = new GraphDbRepository(session);
       reqpos.deleteAllNodes();
       reqpos.dropIndexes();
       return 0;
@@ -86,8 +87,8 @@ class SetupCommand implements Callable<Integer> {
 
   @Override
   public Integer call() {
-    try (var session = GraphDbSession.start()) {
-      final var repo = new GraphDbRepository(session);
+    try (val session = GraphDbSession.start()) {
+      val repo = new GraphDbRepository(session);
       repo.createIndexes();
       return 0;
     } catch (Exception e) {

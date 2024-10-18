@@ -1,6 +1,7 @@
 package com.github.mito99.javacallgraph.bytecode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -36,7 +37,7 @@ public interface MtCallable {
       return calledMethods;
     }
 
-    val invokeOpcodeSet = new HashSet<>(List.of(Opcode.INVOKEVIRTUAL, Opcode.INVOKESTATIC,
+    val invokeOpcodeSet = new HashSet<>(Arrays.asList(Opcode.INVOKEVIRTUAL, Opcode.INVOKESTATIC,
         Opcode.INVOKESPECIAL, Opcode.INVOKEINTERFACE));
 
     CodeIterator codeIterator = codeAttribute.iterator();
@@ -50,7 +51,7 @@ public interface MtCallable {
       int methodRefIndex = codeIterator.u16bitAt(index + 1);
       val className = constPool.getMethodrefClassName(methodRefIndex);
       val calledClassInfoOptional = classPool.getClass(className);
-      if (calledClassInfoOptional.isEmpty()) {
+      if (!calledClassInfoOptional.isPresent()) {
         continue;
       }
       val calledClassInfo = calledClassInfoOptional.get();

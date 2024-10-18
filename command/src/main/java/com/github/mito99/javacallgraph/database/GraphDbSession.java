@@ -28,22 +28,22 @@ public class GraphDbSession implements AutoCloseable {
   }
 
   public void writeTransaction(Consumer<Transaction> action) {
-    try (var tx = this.session.beginTransaction()) {
+    try (val tx = this.session.beginTransaction()) {
       action.accept(tx);
       tx.commit();
     }
   }
 
   public <T> T writeTransaction(Function<Transaction, T> action) {
-    try (var tx = this.session.beginTransaction()) {
-      var result = action.apply(tx);
+    try (val tx = this.session.beginTransaction()) {
+      val result = action.apply(tx);
       tx.commit();
       return result;
     }
   }
 
   public <T> T readTransaction(Function<Transaction, T> action) {
-    try (var tx = this.session.beginTransaction()) {
+    try (val tx = this.session.beginTransaction()) {
       return action.apply(tx);
     }
   }

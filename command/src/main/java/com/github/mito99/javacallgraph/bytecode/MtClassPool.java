@@ -8,10 +8,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import javassist.ClassPath;
 import javassist.ClassPool;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
+import com.google.common.collect.Maps;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -68,8 +70,6 @@ public class MtClassPool {
       throw new IllegalArgumentException("Module directory not found: " + path);
     }
 
-    record ClassInfo(String className, Optional<MtClass> mtClass) {
-    }
     val classes =
         Files.walk(path).filter(Files::isRegularFile).filter(p -> p.toString().endsWith(".class"))
             .filter(p -> !p.toString().contains("module-info.class"))
@@ -77,10 +77,17 @@ public class MtClassPool {
               val relativePath = path.relativize(p).toString();
               val className = relativePath.replace("/", ".").replace(".class", "");
               return new ClassInfo(className, classPool.getClass(className));
-            }).filter(p -> p.mtClass.isPresent()).map(p -> Map.entry(p.className, p.mtClass.get()))
+            }).filter(p -> p.mtClass.isPresent())
+            .map(p -> Maps.immutableEntry(p.className, p.mtClass.get()))
             .filter(Objects::nonNull)
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     return new MtModule(moduleName, moduleType, classes);
+  }
+
+  @AllArgsConstructor
+  static class ClassInfo {
+    String className;
+    Optional<MtClass> mtClass;
   }
 }
