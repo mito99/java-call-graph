@@ -1,13 +1,18 @@
 import neo4j, { Driver, Record, Session } from "neo4j-driver";
 import { CallingMethodTree, MethodNode } from "./types";
 
-// Neo4j ドライバーの初期化
-const driver: Driver = neo4j.driver(
-  "bolt://localhost:7687",
-  neo4j.auth.basic("neo4j", "password")
-);
-
 export function getSession(): Session {
+  const neo4jConfig = {
+    uri: process.env.NEO4J_URI as string,
+    username: process.env.NEO4J_USERNAME as string,
+    password: process.env.NEO4J_PASSWORD as string,
+  };
+
+  const driver: Driver = neo4j.driver(
+    neo4jConfig.uri,
+    neo4j.auth.basic(neo4jConfig.username, neo4jConfig.password)
+  );
+
   const session: Session = driver.session();
   return session;
 }
