@@ -52,3 +52,7 @@ startShadowScripts {
         unixScriptFile.text = unixScriptFile.text.replace('$APP_HOME/lib', '$APP_HOME/libs')
     }
 }
+
+processResources {
+    exclude '.env', '.env.*'
+}

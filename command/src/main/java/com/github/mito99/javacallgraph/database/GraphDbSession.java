@@ -18,7 +18,8 @@ public class GraphDbSession implements AutoCloseable {
   }
 
   public static GraphDbSession start() {
-    val dotenv = Dotenv.load();
+    val dotenv = Dotenv.configure().ignoreIfMissing().directory(".").load();
+
     val uri = dotenv.get("NEO4J_URI");
     val user = dotenv.get("NEO4J_USER");
     val password = dotenv.get("NEO4J_PASSWORD");
