@@ -1,9 +1,11 @@
 import { getCallingMethodsByDigest, getSession } from "@/lib/neo4j";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
+export async function GET(
+  request: Request,
+  { searchParams }: { searchParams: URLSearchParams }
+) {
   try {
-    const { searchParams } = new URL(request.url);
     const methodDigest = searchParams.get("methodDigest") ?? "";
     const hopCount = parseInt(searchParams.get("hopCount") ?? "5");
 
