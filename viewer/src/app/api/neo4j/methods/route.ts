@@ -1,11 +1,11 @@
 import { getMethodsByClass, getSession } from "@/lib/neo4j";
 import { NextResponse } from "next/server";
 
-export async function GET(
-  request: Request,
-  { searchParams }: { searchParams: URLSearchParams }
-) {
+export const dynamic = "force-dynamic";
+
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
     const packageName = searchParams.get("packageName") ?? "";
     const className = searchParams.get("className") ?? "";
     const methodName = searchParams.get("methodName") ?? "";
