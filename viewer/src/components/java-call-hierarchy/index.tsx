@@ -5,11 +5,13 @@ import { Slider } from "@/components/ui/slider";
 import { useDebouncedState } from "@/hooks/use-debounced-state"; // カスタムフックのインポート
 import { toast } from "@/hooks/use-toast";
 import { CallingMethodTree } from "@/lib/neo4j";
-import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 import { Label } from "../ui/label";
 import { HierarchyDialog } from "./dialog";
 import { SearchForm } from "./search-form";
 import { SearchResults } from "./search-results";
+
 export interface SearchResult {
   methodDigest: string;
   packageName: string;
@@ -52,6 +54,7 @@ export function JavaCallHierarchyComponent() {
   const [hopCount, setHopCount] = useState(3);
   const [callingMethodTree, setCallingMethodTree] = useState<CallingMethodTree | null>(null);
   const [isLoading, setIsLoading] = useDebouncedState(false, { delay: 300 });
+  const searchParams = useSearchParams()
 
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -100,11 +103,11 @@ export function JavaCallHierarchyComponent() {
     })
   }
 
-  const handleItemClick = async (item: SearchResult) => {
+  const handleItemClick = useCallback(async (item: SearchResult) => {
     setIsLoading(true);
     setSelectedItem(item);
 
-    try{
+    try {
       const params = new URLSearchParams();
       params.append("methodDigest", item.methodDigest ?? "");
       params.append("hopCount", hopCount.toString()); 
@@ -123,7 +126,55 @@ export function JavaCallHierarchyComponent() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [hopCount, setIsLoading]);
+
+  useEffect(() => {
+    const query = searchParams.get('query')
+    if (!query) return
+
+    // クエリパラメータから検索クエリを設定
+    setSearchQuery(new SearchQuery(query))
+    
+    // 自動検索の実行
+    const executeSearch = async () => {
+      setIsLoading(true)
+      try {
+        const params = new URLSearchParams()
+        const searchQuery = new SearchQuery(query)
+        params.append("packageName", searchQuery.packageName)
+        params.append("className", searchQuery.className)
+        params.append("methodName", searchQuery.methodName)
+        params.append("limit", searchQuery.limit.toString())
+        
+        const response = await fetch(`/api/neo4j/methods?${params.toString()}`)
+        const results = await response.json()
+
+        setSearchResults(results)
+        
+        // 検索結果が1件の場合、自動的に階層ダイアログを表示
+        if (results.length === 1) {
+          await handleItemClick(results[0])
+        } else if (results.length === 0) {
+          toast({
+            title: "結果が見つかりませんでした",
+            description: "検索クエリを調整してみてください。",
+            variant: "destructive",
+          })
+        }
+      } catch (error) {
+        console.error('Search error:', error)
+        toast({
+          title: "検索に失敗しました",
+          description: "検索中にエラーが発生しました。再試行してください。",
+          variant: "destructive",
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    executeSearch()
+  }, [searchParams, handleItemClick, setIsLoading])
 
   return (
     <div className="container mx-auto p-4 ">
